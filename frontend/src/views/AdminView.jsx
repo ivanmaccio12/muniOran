@@ -1,0 +1,141 @@
+import { useState, useMemo } from 'react';
+import { COLUMNS_ADMIN } from '../data/mockReclamos';
+import KanbanColumn from '../components/KanbanColumn';
+import ReclamoDetail from '../components/ReclamoDetail';
+import FilterBar from '../components/FilterBar';
+import './AdminView.css';
+
+const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardReclamo, getNextEstado, getPrevEstado, addComentario, fetchReclamo }) => {
+  const [selectedReclamo, setSelectedReclamo] = useState(null);
+  const [draggedId, setDraggedId] = useState(null);
+  const [filters, setFilters] = useState({ search: '', equipo: '', motivo: '', estado: '' });
+
+  const filteredReclamos = useMemo(() => {
+    return reclamos.filter(r => {
+      const term = (filters.search || '').toLowerCase();
+      if (term && !(
+        r.id.toLowerCase().includes(term) ||
+        r.nombre_apellido.toLowerCase().includes(term) ||
+        r.descripcion.toLowerCase().includes(term) ||
+        r.direccion.toLowerCase().includes(term) ||
+        r.motivo.toLowerCase().includes(term) ||
+        r.barrio?.toLowerCase().includes(term) ||
+        r.dni.includes(term)
+      )) return false;
+      if (filters.equipo && r.equipo !== filters.equipo) return false;
+      if (filters.motivo && r.motivo !== filters.motivo) return false;
+      if (filters.estado && r.estado !== filters.estado) return false;
+      return true;
+    });
+  }, [reclamos, filters]);
+
+  const reclamosByEstado = useMemo(() => {
+    const grouped = {};
+    COLUMNS_ADMIN.forEach(col => {
+      grouped[col.id] = filteredReclamos
+        .filter(r => r.estado === col.id)
+        .sort((a, b) => {
+          // Non-resolved: oldest first. Resolved: newest first.
+          if (['resuelto', 'descartado'].includes(col.id)) return new Date(b.timestamp) - new Date(a.timestamp);
+          return new Date(a.timestamp) - new Date(b.timestamp);
+        });
+    });
+    return grouped;
+  }, [filteredReclamos]);
+
+  const stats = useMemo(() => ({
+    total: reclamos.length,
+    nuevos: reclamos.filter(r => r.estado === 'nuevo').length,
+    pending: reclamos.filter(r => !['resuelto', 'descartado'].includes(r.estado)).length,
+    resueltos: reclamos.filter(r => r.estado === 'resuelto').length,
+  }), [reclamos]);
+
+  const handleDragStart = (e, id) => { setDraggedId(id); e.dataTransfer.effectAllowed = 'move'; };
+  const handleDrop = (e, newEstado) => { if (draggedId) { moveEstado(draggedId, newEstado); setDraggedId(null); } };
+
+  const handleMoveNext = (id) => {
+    const r = reclamos.find(x => x.id === id);
+    const next = getNextEstado(r.estado);
+    if (next) moveEstado(id, next);
+  };
+
+  const handleMovePrev = (id) => {
+    const r = reclamos.find(x => x.id === id);
+    const prev = getPrevEstado(r.estado);
+    if (prev) moveEstado(id, prev);
+  };
+
+  const handleCardClick = async (r) => {
+    const full = await fetchReclamo(r.id);
+    setSelectedReclamo(full || r);
+  };
+
+  const handleUpdateEstado = async (id, estado) => {
+    await moveEstado(id, estado);
+    const full = await fetchReclamo(id);
+    setSelectedReclamo(full);
+  };
+
+  const handleUpdateMotivo = async (id, motivo) => {
+    await updateMotivo(id, motivo);
+    const full = await fetchReclamo(id);
+    setSelectedReclamo(full);
+  };
+
+  const handleAssign = async (id, workerId, equipo) => {
+    await assignWorker(id, workerId, equipo);
+    const full = await fetchReclamo(id);
+    setSelectedReclamo(full);
+  };
+
+  const handleAddComentario = async (id, autor, rol, texto) => {
+    await addComentario(id, autor, rol, texto);
+    const full = await fetchReclamo(id);
+    setSelectedReclamo(full);
+  };
+
+  return (
+    <div className="admin-view">
+      <div className="admin-header">
+        <div className="admin-stats">
+          <div className="stat-pill"><span className="stat-num">{stats.total}</span><span className="stat-lbl">Total</span></div>
+          <div className="stat-pill s-new"><span className="stat-num">{stats.nuevos}</span><span className="stat-lbl">Nuevos</span></div>
+          <div className="stat-pill s-pend"><span className="stat-num">{stats.pending}</span><span className="stat-lbl">Pendientes</span></div>
+          <div className="stat-pill s-done"><span className="stat-num">{stats.resueltos}</span><span className="stat-lbl">Resueltos</span></div>
+        </div>
+      </div>
+
+      <FilterBar filters={filters} onFilterChange={setFilters} />
+
+      <div className="kanban-board">
+        {COLUMNS_ADMIN.map(col => (
+          <KanbanColumn
+            key={col.id}
+            column={col}
+            reclamos={reclamosByEstado[col.id] || []}
+            onDragStart={handleDragStart}
+            onDrop={handleDrop}
+            onCardClick={handleCardClick}
+            onMoveNext={handleMoveNext}
+            onMovePrev={handleMovePrev}
+            onDiscard={discardReclamo}
+            showArrows={true}
+          />
+        ))}
+      </div>
+
+      {selectedReclamo && (
+        <ReclamoDetail
+          reclamo={selectedReclamo}
+          onClose={() => setSelectedReclamo(null)}
+          onUpdateEstado={handleUpdateEstado}
+          onUpdateMotivo={handleUpdateMotivo}
+          onAssign={handleAssign}
+          onAddComentario={handleAddComentario}
+        />
+      )}
+    </div>
+  );
+};
+
+export default AdminView;

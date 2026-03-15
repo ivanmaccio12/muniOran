@@ -1,6 +1,6 @@
-import { pool } from './dbService.js';
+import db from './db.js';
 
-const SESSION_TTL_HOURS = 24;
+const SESSION_TTL_HOURS = 720; // 30 días
 
 /**
  * Returns the full message history for a session.
@@ -8,24 +8,21 @@ const SESSION_TTL_HOURS = 24;
  */
 export const getHistory = async (sessionId) => {
     try {
-        const result = await pool.query(
-            `SELECT history, updated_at FROM conversations WHERE session_id = $1`,
-            [sessionId]
-        );
+        const row = db.prepare('SELECT history, updated_at FROM conversations WHERE session_id = ?').get(sessionId);
 
-        if (result.rows.length === 0) return [];
+        if (!row) return [];
 
-        const { history, updated_at } = result.rows[0];
+        const { history, updated_at } = row;
         const hoursSinceUpdate = (Date.now() - new Date(updated_at).getTime()) / (1000 * 60 * 60);
 
         if (hoursSinceUpdate > SESSION_TTL_HOURS) {
             // Session expired — clear it
-            await pool.query(`DELETE FROM conversations WHERE session_id = $1`, [sessionId]);
+            db.prepare('DELETE FROM conversations WHERE session_id = ?').run(sessionId);
             console.log(`🗑️  Session expired and cleared: ${sessionId}`);
             return [];
         }
 
-        return history || [];
+        return JSON.parse(history) || [];
     } catch (error) {
         console.error('Error reading conversation history:', error.message);
         return [];
@@ -37,13 +34,15 @@ export const getHistory = async (sessionId) => {
  */
 export const saveHistory = async (sessionId, history) => {
     try {
-        await pool.query(
-            `INSERT INTO conversations (session_id, history, updated_at)
-             VALUES ($1, $2, NOW())
-             ON CONFLICT (session_id)
-             DO UPDATE SET history = $2, updated_at = NOW()`,
-            [sessionId, JSON.stringify(history)]
-        );
+        db.prepare(`
+            INSERT INTO conversations (session_id, history, updated_at)
+            VALUES (@session_id, @history, datetime('now'))
+            ON CONFLICT (session_id)
+            DO UPDATE SET history = @history, updated_at = datetime('now')
+        `).run({
+            session_id: sessionId,
+            history: JSON.stringify(history)
+        });
     } catch (error) {
         console.error('Error saving conversation history:', error.message);
     }

@@ -1,0 +1,24 @@
+.worker-view { display: flex; flex-direction: column; flex: 1; }
+
+.worker-header {
+  padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border-color); gap: 16px; flex-wrap: wrap;
+  background: var(--bg-secondary);
+}
+
+.worker-selector { display: flex; align-items: center; gap: 10px; }
+.worker-selector label { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+.worker-selector select {
+  padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);
+  background: var(--bg-input); color: var(--text-primary); font-size: 0.82rem;
+  font-family: 'Poppins', sans-serif; cursor: pointer;
+}
+.worker-selector select:focus { outline: none; border-color: var(--brand-green); }
+.worker-selector select option { background: var(--bg-secondary); color: var(--text-primary); }
+
+.worker-info { display: flex; align-items: center; gap: 8px; }
+.worker-count {
+  font-size: 0.78rem; font-weight: 600; color: var(--brand-green);
+  background: rgba(0,141,72,0.08); padding: 5px 14px; border-radius: 20px;
+  border: 1px solid rgba(0,141,72,0.15);
+}

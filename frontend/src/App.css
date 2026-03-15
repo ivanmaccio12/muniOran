@@ -1,0 +1,13 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-board {
+  display: flex;
+  gap: 14px;
+  padding: 16px 20px;
+  flex: 1;
+  overflow-x: auto;
+}

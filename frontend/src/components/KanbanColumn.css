@@ -1,0 +1,73 @@
+.kanban-column {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  min-width: 310px;
+  max-width: 340px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 140px);
+  transition: border-color var(--transition-normal);
+}
+
+.kanban-column.drag-over {
+  border-color: var(--accent-indigo);
+  box-shadow: var(--shadow-glow-indigo);
+}
+
+.column-header {
+  padding: 18px 18px 0;
+}
+
+.column-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.column-icon {
+  font-size: 1.1rem;
+}
+
+.column-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.column-count {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+}
+
+.column-indicator {
+  height: 3px;
+  border-radius: 4px;
+  opacity: 0.7;
+}
+
+.column-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.column-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+  opacity: 0.6;
+}

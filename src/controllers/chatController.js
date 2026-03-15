@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getSystemPrompt } from '../config/systemPrompt.js';
 import { getHistory, saveHistory } from '../services/conversationService.js';
+import { createReclamo } from '../services/db.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -65,6 +66,26 @@ export const chatController = async (req, res) => {
                     recommended_area: ''
                 }
             };
+        }
+
+        if (parsedReply.extracted_complaint_data && 
+            parsedReply.extracted_complaint_data.nombre_apellido && 
+            parsedReply.extracted_complaint_data.dni &&
+            parsedReply.extracted_complaint_data.descripcion &&
+            parsedReply.extracted_complaint_data.direccion) {
+            
+            try {
+                const complaintData = {
+                    ...parsedReply.extracted_complaint_data,
+                    telefono: session_id // asumiendo que session_id es el teléfono de whatsapp
+                };
+                
+                const savedComplaint = createReclamo(complaintData);
+                console.log(`✅ Nuevo reclamo guardado en BD. ID: ${savedComplaint.id}`);
+            } catch (dbError) {
+                console.error('❌ Error al guardar el reclamo automáticamente:', dbError.message);
+                // Opcional: Podríamos alterar parsedReply.answer para avisar que hubo un problema temporal.
+            }
         }
 
         // Append the assistant reply text to the history and save back to DB
