@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const API_BASE = 'http://localhost:3003/api';
+const API_BASE = import.meta.env.DEV ? 'http://localhost:3003/api' : '/api';
 
 // Equipos/Áreas de la Municipalidad
 export const EQUIPOS = [

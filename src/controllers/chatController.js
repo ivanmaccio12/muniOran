@@ -82,6 +82,9 @@ export const chatController = async (req, res) => {
                 
                 const savedComplaint = createReclamo(complaintData);
                 console.log(`✅ Nuevo reclamo guardado en BD. ID: ${savedComplaint.id}`);
+                
+                // Le aseguramos al usuario final cuál es su número de reclamo.
+                parsedReply.answer += `\n\n✅ ¡Listo! Tu reclamo está registrado. El número de seguimiento es: *${savedComplaint.id}*.`;
             } catch (dbError) {
                 console.error('❌ Error al guardar el reclamo automáticamente:', dbError.message);
                 // Opcional: Podríamos alterar parsedReply.answer para avisar que hubo un problema temporal.
