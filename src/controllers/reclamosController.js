@@ -31,7 +31,7 @@ export const patchReclamo = (req, res) => {
     
     // Si el estado pasó a "resuelto", notificamos la resolución
     if (req.body.estado === 'resuelto') {
-      console.log(`📲 [WhatsApp] → ${updated.telefono}: ¡Hola ${updated.nombre_apellido}! Te informamos que tu reclamo ${updated.id} por "${updated.motivo}" ha sido RESUELTO por el equipo de ${updated.equipo}. ¡Gracias por usar MuniOrán!`);
+      console.log(`📲 [WhatsApp] → ${updated.telefono}: ¡Hola ${updated.nombre_apellido}! Te informamos que tu reclamo ${updated.id} por "${updated.motivo}" ha sido RESUELTO por el equipo de ${updated.equipo}. ¡Gracias por usar El Municipal!`);
     } else {
       console.log(`📲 [WhatsApp] → ${updated.telefono}: Tu reclamo ${updated.id} fue actualizado.`);
     }
