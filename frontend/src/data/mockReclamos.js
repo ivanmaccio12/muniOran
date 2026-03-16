@@ -21,7 +21,7 @@ export const COLUMNS_ADMIN = [
   { id: 'descartado', title: 'Descartado', color: '#ef4444', icon: '🚫', order: 3 },
 ];
 
-export const COLUMNS_WORKER = COLUMNS_ADMIN.filter(c => !['descartado'].includes(c.id));
+export const COLUMNS_WORKER = COLUMNS_ADMIN.filter(c => ['asignado', 'resuelto'].includes(c.id));
 
 export const MOTIVOS = [
   'Sin categorizar',

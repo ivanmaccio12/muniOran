@@ -97,7 +97,7 @@ if (count.c === 0) {
       direccion: 'San Martín esq. Sarmiento',
       barrio: 'Centro',
       coordenadas: '-23.1310,-64.3230',
-      estado: 'en_revision',
+      estado: 'nuevo',
       equipo: 'Obras Públicas',
       asignado_a: null,
       solicita_update: 1,
