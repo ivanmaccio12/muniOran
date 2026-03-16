@@ -1,6 +1,8 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import pg from 'pg';
+import OpenAI from 'openai';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '..', '..', 'data', 'munioran.db');
@@ -262,5 +264,42 @@ function formatReclamo(row) {
     solicita_update: !!row.solicita_update,
   };
 }
+
+// ============= RAG: VECTOR SEARCH =============
+
+const pgPool = process.env.DATABASE_URL
+  ? new pg.Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
+    })
+  : null;
+
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
+
+export const searchKnowledge = async (queryText) => {
+  if (!openai || !pgPool) return [];
+  try {
+    const embedRes = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: queryText,
+      encoding_format: 'float',
+    });
+    const embedding = embedRes.data[0].embedding;
+
+    const result = await pgPool.query(`
+      SELECT title, url, content
+      FROM knowledge_documents
+      ORDER BY embedding <=> $1::vector
+      LIMIT 4
+    `, [JSON.stringify(embedding)]);
+
+    return result.rows;
+  } catch (e) {
+    console.error('Vector Search Error:', e.message);
+    return [];
+  }
+};
 
 export default db;
