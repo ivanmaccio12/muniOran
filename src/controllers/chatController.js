@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getSystemPrompt } from '../config/systemPrompt.js';
 import { getHistory, saveHistory } from '../services/conversationService.js';
-import { createReclamo } from '../services/db.js';
+import { createReclamo, searchKnowledge } from '../services/db.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -12,13 +12,23 @@ const anthropic = new Anthropic({
 
 export const chatController = async (req, res) => {
     try {
-        const { message, session_id, context, channel, userId } = req.body;
+        const { message, session_id, channel, userId } = req.body;
+        let { context } = req.body;
 
         if (!message) {
             return res.status(400).json({ error: 'El campo message es requerido.' });
         }
         if (!session_id) {
             return res.status(400).json({ error: 'El campo session_id es requerido (usar el número de teléfono del usuario).' });
+        }
+
+        // Perform Retrieval-Augmented Generation (RAG)
+        const relevantDocs = await searchKnowledge(message);
+        if (relevantDocs && relevantDocs.length > 0) {
+            const addedContext = relevantDocs.map(doc =>
+                `📌 Título: ${doc.title}\n🔗 Fuente: ${doc.url}\n📄 Información: ${doc.content}`
+            ).join('\n\n');
+            context = (context ? context + '\n\n' : '') + addedContext;
         }
 
         // Build system prompt (inject optional context if provided by n8n/RAG)
