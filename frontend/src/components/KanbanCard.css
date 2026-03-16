@@ -106,10 +106,11 @@
 .card-actions { display: flex; gap: 4px; }
 
 .card-action-btn {
-  width: 26px; height: 26px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);
-  background: var(--bg-surface); color: var(--text-muted); font-size: 0.7rem;
+  width: 28px; height: 28px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);
+  background: var(--bg-surface); color: var(--text-muted); font-size: 0.8rem;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: all var(--transition-fast); padding: 0;
+  line-height: 1;
 }
 .card-action-btn:hover { border-color: var(--brand-green); color: var(--brand-green); background: rgba(0,141,72,0.08); }
 

@@ -10,7 +10,7 @@ function App() {
   const reclamosState = useReclamos();
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/kanban">
       <div className="app">
         <Navbar />
         <Routes>
