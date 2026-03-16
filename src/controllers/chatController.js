@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getSystemPrompt } from '../config/systemPrompt.js';
 import { getHistory, saveHistory } from '../services/conversationService.js';
-import { createReclamo, searchKnowledge } from '../services/db.js';
+import { createReclamo, searchKnowledge, getReclamoById } from '../services/db.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -98,6 +98,37 @@ export const chatController = async (req, res) => {
             } catch (dbError) {
                 console.error('❌ Error al guardar el reclamo automáticamente:', dbError.message);
                 // Opcional: Podríamos alterar parsedReply.answer para avisar que hubo un problema temporal.
+            }
+        }
+
+        // Consulta de reclamo por ID (intent: consulta_reclamo)
+        if (parsedReply.reclamo_id) {
+            try {
+                const reclamoId = String(parsedReply.reclamo_id).toUpperCase().trim();
+                const reclamo = getReclamoById(reclamoId);
+                if (reclamo) {
+                    const estadoEmoji = { nuevo: '🟡', asignado: '🔵', resuelto: '✅', descartado: '❌' }[reclamo.estado] || '⚪';
+                    const comentariosTexto = reclamo.comentarios && reclamo.comentarios.length > 0
+                        ? reclamo.comentarios.map(c => `  • [${c.autor} — ${c.rol}] ${c.texto}`).join('\n')
+                        : '  Sin comentarios aún.';
+                    const detalle = [
+                        ``,
+                        `📋 *Reclamo ${reclamo.id}*`,
+                        `• Motivo: ${reclamo.motivo}`,
+                        `• Estado: ${estadoEmoji} ${reclamo.estado}`,
+                        `• Dirección: ${reclamo.direccion}`,
+                        `• Descripción: ${reclamo.descripcion}`,
+                        reclamo.equipo ? `• Equipo asignado: ${reclamo.equipo}` : null,
+                        ``,
+                        `💬 Comentarios del equipo:`,
+                        comentariosTexto,
+                    ].filter(Boolean).join('\n');
+                    parsedReply.answer += detalle;
+                } else {
+                    parsedReply.answer += `\n\nNo encontré ningún reclamo con el número *${reclamoId}*. Verificá el número e intentá de nuevo.`;
+                }
+            } catch (lookupError) {
+                console.error('Error buscando reclamo por ID:', lookupError.message);
             }
         }
 

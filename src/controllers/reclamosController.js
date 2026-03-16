@@ -1,4 +1,5 @@
 import { getAllReclamos, getReclamoById, updateReclamo, addComentario, getComentarios, createReclamo } from '../services/db.js';
+import { sendWhatsApp } from '../services/whatsappService.js';
 
 // GET /api/reclamos
 export const listReclamos = (req, res) => {
@@ -29,9 +30,29 @@ export const patchReclamo = (req, res) => {
     const updated = updateReclamo(req.params.id, req.body);
     if (!updated) return res.status(404).json({ error: 'Reclamo no encontrado o sin cambios' });
     
-    // Si el estado pasó a "resuelto", notificamos la resolución
-    if (req.body.estado === 'resuelto') {
-      console.log(`📲 [WhatsApp] → ${updated.telefono}: ¡Hola ${updated.nombre_apellido}! Te informamos que tu reclamo ${updated.id} por "${updated.motivo}" ha sido RESUELTO por el equipo de ${updated.equipo}. ¡Gracias por usar El Municipal!`);
+    // Notificación WhatsApp al vecino según el nuevo estado
+    if (req.body.estado === 'resuelto' || req.body.estado === 'descartado') {
+      const comentariosTexto = updated.comentarios && updated.comentarios.length > 0
+        ? updated.comentarios.map(c => `  - [${c.autor}] ${c.texto}`).join('\n')
+        : '  (sin comentarios)';
+      const estadoLabel = req.body.estado === 'resuelto' ? 'RESUELTO ✅' : 'DESCARTADO ❌';
+      const mensaje = [
+        `🏛️ *Municipalidad de Orán — Actualización de Reclamo*`,
+        ``,
+        `Hola *${updated.nombre_apellido}*, te informamos que tu reclamo quedó como *${estadoLabel}*.`,
+        ``,
+        `📋 *Detalle*`,
+        `• ID: ${updated.id}`,
+        `• Motivo: ${updated.motivo}`,
+        `• Descripción: ${updated.descripcion}`,
+        `• Dirección: ${updated.direccion}`,
+        ``,
+        `💬 *Comentarios del equipo*`,
+        comentariosTexto,
+        ``,
+        `Gracias por usar El Municipal.`,
+      ].join('\n');
+      sendWhatsApp(updated.telefono, mensaje);
     } else {
       console.log(`📲 [WhatsApp] → ${updated.telefono}: Tu reclamo ${updated.id} fue actualizado.`);
     }

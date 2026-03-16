@@ -58,7 +58,7 @@
 
 .card-date { display: block; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; }
 
-.card-descripcion { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 10px; }
+.card-descripcion { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* Photo */
 .card-photo {

@@ -18,7 +18,6 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
     return 'motivo-otro';
   };
 
-  const truncate = (text, max = 90) => text.length <= max ? text : text.substring(0, max) + '...';
 
   const mapsUrl = reclamo.coordenadas
     ? `https://www.google.com/maps?q=${reclamo.coordenadas}`
@@ -55,7 +54,7 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
       <span className="card-date">{formatDate(reclamo.timestamp)}</span>
 
       {/* Description */}
-      <p className="card-descripcion">{truncate(reclamo.descripcion)}</p>
+      <p className="card-descripcion">{reclamo.descripcion}</p>
 
       {/* Photo thumbnail */}
       {reclamo.fotos && reclamo.fotos.length > 0 && (
