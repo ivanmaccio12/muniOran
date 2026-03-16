@@ -50,13 +50,29 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
     resueltos: reclamos.filter(r => r.estado === 'resuelto').length,
   }), [reclamos]);
 
+  const checkCanMoveToAsignado = (r, estadoDestino) => {
+    if (estadoDestino === 'asignado' && (!r.equipo || !r.asignado_a)) {
+      alert('Para mover a "Asignado", primero debés ingresar al detalle del reclamo y asignarle un Equipo y una Persona responsable.');
+      return false;
+    }
+    return true;
+  };
+
   const handleDragStart = (e, id) => { setDraggedId(id); e.dataTransfer.effectAllowed = 'move'; };
-  const handleDrop = (e, newEstado) => { if (draggedId) { moveEstado(draggedId, newEstado); setDraggedId(null); } };
+  const handleDrop = (e, newEstado) => { 
+    if (draggedId) { 
+      const r = reclamos.find(x => x.id === draggedId);
+      if (checkCanMoveToAsignado(r, newEstado)) {
+        moveEstado(draggedId, newEstado); 
+      }
+      setDraggedId(null); 
+    } 
+  };
 
   const handleMoveNext = (id) => {
     const r = reclamos.find(x => x.id === id);
     const next = getNextEstado(r.estado);
-    if (next) moveEstado(id, next);
+    if (next && checkCanMoveToAsignado(r, next)) moveEstado(id, next);
   };
 
   const handleMovePrev = (id) => {
@@ -71,6 +87,9 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
   };
 
   const handleUpdateEstado = async (id, estado) => {
+    const r = reclamos.find(x => x.id === id);
+    if (!checkCanMoveToAsignado(r, estado)) return;
+    
     await moveEstado(id, estado);
     const full = await fetchReclamo(id);
     setSelectedReclamo(full);

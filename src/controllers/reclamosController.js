@@ -28,8 +28,14 @@ export const patchReclamo = (req, res) => {
   try {
     const updated = updateReclamo(req.params.id, req.body);
     if (!updated) return res.status(404).json({ error: 'Reclamo no encontrado o sin cambios' });
-    // Log WhatsApp notification simulation
-    console.log(`📲 [WhatsApp] → ${updated.telefono}: Tu reclamo ${updated.id} fue actualizado`);
+    
+    // Si el estado pasó a "resuelto", notificamos la resolución
+    if (req.body.estado === 'resuelto') {
+      console.log(`📲 [WhatsApp] → ${updated.telefono}: ¡Hola ${updated.nombre_apellido}! Te informamos que tu reclamo ${updated.id} por "${updated.motivo}" ha sido RESUELTO por el equipo de ${updated.equipo}. ¡Gracias por usar MuniOrán!`);
+    } else {
+      console.log(`📲 [WhatsApp] → ${updated.telefono}: Tu reclamo ${updated.id} fue actualizado.`);
+    }
+    
     res.json(updated);
   } catch (err) {
     console.error('Error updating reclamo:', err);
