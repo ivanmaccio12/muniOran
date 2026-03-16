@@ -127,20 +127,24 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
       <FilterBar filters={filters} onFilterChange={setFilters} />
 
       <div className="kanban-board">
-        {COLUMNS_ADMIN.map(col => (
-          <KanbanColumn
-            key={col.id}
-            column={col}
-            reclamos={reclamosByEstado[col.id] || []}
-            onDragStart={handleDragStart}
-            onDrop={handleDrop}
-            onCardClick={handleCardClick}
-            onMoveNext={handleMoveNext}
-            onMovePrev={handleMovePrev}
-            onDiscard={discardReclamo}
-            showArrows={true}
-          />
-        ))}
+        {COLUMNS_ADMIN.map(col => {
+          const isFirst = col.order === 0;
+          const isLast = col.order === COLUMNS_ADMIN.length - 1;
+          return (
+            <KanbanColumn
+              key={col.id}
+              column={col}
+              reclamos={reclamosByEstado[col.id] || []}
+              onDragStart={handleDragStart}
+              onDrop={handleDrop}
+              onCardClick={handleCardClick}
+              onMoveNext={!isLast ? handleMoveNext : null}
+              onMovePrev={!isFirst ? handleMovePrev : null}
+              onDiscard={discardReclamo}
+              showArrows={true}
+            />
+          );
+        })}
       </div>
 
       {selectedReclamo && (
