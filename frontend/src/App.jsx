@@ -8,6 +8,15 @@ import WorkerView from './views/WorkerView';
 import LoginView from './views/LoginView';
 import UsersView from './views/UsersView';
 import './App.css';
+import { useAuth } from './context/AuthContext.jsx';
+
+const RootRedirect = ({ reclamosState }) => {
+  const { user } = useAuth();
+  if (user?.rol === 'equipo') {
+    return <Navigate to="/mis-reclamos" replace />;
+  }
+  return <AdminView {...reclamosState} />;
+};
 
 function AppRoutes() {
   const reclamosState = useReclamos();
@@ -16,8 +25,8 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginView />} />
       <Route path="/" element={
-        <ProtectedRoute requiredRoles={['admin', 'gestor']}>
-          <AdminView {...reclamosState} />
+        <ProtectedRoute requiredRoles={['admin', 'gestor', 'equipo']}>
+          <RootRedirect reclamosState={reclamosState} />
         </ProtectedRoute>
       } />
       <Route path="/mis-reclamos" element={
