@@ -1,7 +1,7 @@
 import KanbanCard from './KanbanCard';
 import './KanbanColumn.css';
 
-const KanbanColumn = ({ column, reclamos, onDragStart, onDragOver, onDrop, onCardClick, onMoveNext, onMovePrev, onDiscard, showArrows, readOnly, getWorkerName }) => {
+const KanbanColumn = ({ column, reclamos, onDragStart, onDragOver, onDrop, onCardClick, onMoveNext, onMovePrev, onDiscard, onApplySuggestion, showArrows, readOnly, getWorkerName }) => {
   return (
     <div
       className="kanban-column"
@@ -32,6 +32,7 @@ const KanbanColumn = ({ column, reclamos, onDragStart, onDragOver, onDrop, onCar
               onMoveNext={onMoveNext}
               onMovePrev={onMovePrev}
               onDiscard={onDiscard}
+              onApplySuggestion={onApplySuggestion}
               showArrows={showArrows}
               readOnly={readOnly}
               getWorkerName={getWorkerName}

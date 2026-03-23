@@ -35,7 +35,7 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
       <Route path="/usuarios" element={
-        <ProtectedRoute requiredRoles={['admin']}>
+        <ProtectedRoute requiredRoles={['admin', 'gestor']}>
           <UsersView />
         </ProtectedRoute>
       } />

@@ -118,7 +118,7 @@ export const useReclamos = () => {
 
   const updateMotivo = (id, motivo) => patchAndRefresh(id, { motivo });
 
-  const discardReclamo = (id) => patchAndRefresh(id, { estado: 'descartado' });
+  const discardReclamo = (id, notificar = true) => patchAndRefresh(id, { estado: 'descartado', notificar });
 
   const addComentario = async (id, autor, rol, texto) => {
     try {
@@ -136,6 +136,13 @@ export const useReclamos = () => {
   // Resolve reclamo — requires a comentario (enforced by backend too)
   const resolveReclamo = (id, comentario_resolucion) =>
     patchAndRefresh(id, { estado: 'resuelto', comentario_resolucion });
+
+  const applySuggestion = (reclamo) =>
+    patchAndRefresh(reclamo.id, {
+      estado: 'asignado',
+      equipo: reclamo.suggested_equipo,
+      asignado_a: reclamo.suggested_asignado || null,
+    });
 
   const solicitarUpdate = async (id) => {
     try {
@@ -172,6 +179,7 @@ export const useReclamos = () => {
     discardReclamo,
     addComentario,
     resolveReclamo,
+    applySuggestion,
     solicitarUpdate,
     getNextEstado,
     getPrevEstado,

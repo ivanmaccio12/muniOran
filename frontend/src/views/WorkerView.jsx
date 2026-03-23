@@ -52,7 +52,17 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
   }, [myReclamos]);
 
   const handleDragStart = (e, id) => { setDraggedId(id); e.dataTransfer.effectAllowed = 'move'; };
-  const handleDrop = (_e, newEstado) => { if (draggedId) { moveEstado(draggedId, newEstado); setDraggedId(null); } };
+  const handleDrop = (_e, newEstado) => {
+    if (draggedId) {
+      if (newEstado === 'resuelto') {
+        setResolveTarget(draggedId);
+        setDraggedId(null);
+        return;
+      }
+      moveEstado(draggedId, newEstado);
+      setDraggedId(null);
+    }
+  };
 
   const handleMoveNext = (id) => {
     const r = reclamos.find(x => x.id === id);

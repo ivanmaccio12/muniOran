@@ -72,6 +72,11 @@ db.exec(`
   );
 `);
 
+// Migrations
+try { db.exec("ALTER TABLE reclamos ADD COLUMN notificado INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE reclamos ADD COLUMN suggested_equipo TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE reclamos ADD COLUMN suggested_asignado TEXT"); } catch(e) {}
+
 // ============= SEED USERS =============
 const userCount = db.prepare('SELECT COUNT(*) as c FROM users').get();
 if (userCount.c === 0) {
@@ -231,11 +236,31 @@ export const getReclamoById = (id) => {
 
 // Update reclamo fields
 export const getExistingMotivos = () => {
-  return db.prepare('SELECT DISTINCT motivo FROM reclamos WHERE motivo IS NOT NULL AND motivo != "Sin categorizar"').all().map(r => r.motivo);
+  return db.prepare("SELECT DISTINCT motivo FROM reclamos WHERE motivo IS NOT NULL AND motivo != 'Sin categorizar'").all().map(r => r.motivo);
+};
+
+export const getDistinctEquipos = () => {
+  return db.prepare("SELECT DISTINCT equipo FROM users WHERE equipo IS NOT NULL AND rol = 'equipo' ORDER BY equipo ASC").all().map(r => r.equipo);
+};
+
+// Returns the active user in the given equipo with the fewest assigned active reclamos
+export const getUserWithLeastLoadInEquipo = (equipo) => {
+  const users = db.prepare(
+    "SELECT id FROM users WHERE equipo = ? AND rol = 'equipo' AND activo = 1"
+  ).all(equipo);
+  if (users.length === 0) return null;
+  let best = null, bestCount = Infinity;
+  for (const u of users) {
+    const { c } = db.prepare(
+      "SELECT COUNT(*) as c FROM reclamos WHERE asignado_a = ? AND estado NOT IN ('resuelto', 'descartado')"
+    ).get(u.id);
+    if (c < bestCount) { bestCount = c; best = u.id; }
+  }
+  return best;
 };
 
 export const updateReclamo = (id, fields) => {
-  const allowed = ['estado', 'equipo', 'asignado_a', 'motivo', 'solicita_update'];
+  const allowed = ['estado', 'equipo', 'asignado_a', 'motivo', 'solicita_update', 'notificado', 'suggested_equipo', 'suggested_asignado'];
   const updates = [];
   const values = {};
 
@@ -307,6 +332,7 @@ function formatReclamo(row) {
     ...row,
     fotos: JSON.parse(row.fotos || '[]'),
     solicita_update: !!row.solicita_update,
+    notificado: !!row.notificado,
   };
 }
 
@@ -357,6 +383,42 @@ export const updateUser = (id, fields) => {
   values.id = id;
   db.prepare(`UPDATE users SET ${updates.join(', ')} WHERE id = @id`).run(values);
   return getUserById(id);
+};
+
+export const deleteUserById = (id) => {
+  db.prepare('DELETE FROM users WHERE id = ?').run(id);
+};
+
+// Returns active reclamos (not resuelto/descartado) assigned to a user
+export const getActiveReclamosByAsignado = (userId) => {
+  return db.prepare(
+    "SELECT id FROM reclamos WHERE asignado_a = ? AND estado NOT IN ('resuelto', 'descartado')"
+  ).all(userId);
+};
+
+// Unassign and reset to 'nuevo' all active reclamos assigned to a user
+export const unassignReclamosFromUser = (userId) => {
+  db.prepare(
+    "UPDATE reclamos SET asignado_a = NULL, equipo = NULL, estado = 'nuevo' WHERE asignado_a = ? AND estado NOT IN ('resuelto', 'descartado')"
+  ).run(userId);
+};
+
+export const addFotoToReclamo = (reclamoId, url) => {
+  const row = db.prepare('SELECT fotos FROM reclamos WHERE id = ?').get(reclamoId);
+  if (!row) return null;
+  const fotos = JSON.parse(row.fotos || '[]');
+  if (!fotos.includes(url)) {
+    fotos.push(url);
+    db.prepare('UPDATE reclamos SET fotos = ? WHERE id = ?').run(JSON.stringify(fotos), reclamoId);
+  }
+  return getReclamoById(reclamoId);
+};
+
+export const getActiveReclamoByTelefono = (telefono) => {
+  const row = db.prepare(
+    "SELECT * FROM reclamos WHERE telefono = ? AND estado NOT IN ('resuelto', 'descartado') ORDER BY timestamp DESC LIMIT 1"
+  ).get(telefono);
+  return row ? formatReclamo(row) : null;
 };
 
 export const getCommentCountForReclamo = (reclamoId) => {
@@ -414,6 +476,20 @@ export const searchKnowledge = async (queryText) => {
   } catch (e) {
     return [];
   }
+};
+
+// ============= KNOWLEDGE DOCUMENT HELPERS =============
+
+export const upsertKnowledgeDoc = (title, url, content) => {
+  db.prepare(`
+    INSERT INTO knowledge_documents (title, url, content, scraped_at)
+    VALUES (@title, @url, @content, datetime('now'))
+    ON CONFLICT(url) DO UPDATE SET title = excluded.title, content = excluded.content, scraped_at = datetime('now')
+  `).run({ title, url, content });
+};
+
+export const getKnowledgeDocByUrl = (url) => {
+  return db.prepare('SELECT * FROM knowledge_documents WHERE url = ?').get(url);
 };
 
 export default db;

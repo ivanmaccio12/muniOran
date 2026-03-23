@@ -1,6 +1,6 @@
 import './KanbanCard.css';
 
-const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onDiscard, showArrows = true, readOnly = false, getWorkerName = () => null }) => {
+const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onDiscard, onApplySuggestion, showArrows = true, readOnly = false, getWorkerName = () => null }) => {
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -31,6 +31,8 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
   };
 
   const workerName = reclamo.asignado_a ? getWorkerName(reclamo.asignado_a) : null;
+  const suggestionWorkerName = reclamo.suggested_asignado ? getWorkerName(reclamo.suggested_asignado) : null;
+  const hasSuggestion = reclamo.estado === 'nuevo' && reclamo.suggested_equipo && onApplySuggestion;
 
   const commentCount = reclamo.comentarios?.length || 0;
 
@@ -39,13 +41,17 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
       className={`kanban-card ${readOnly ? 'read-only' : ''} ${reclamo.solicita_update ? 'has-update-request' : ''}`}
       draggable={!readOnly}
       onDragStart={(e) => onDragStart && onDragStart(e, reclamo.id)}
+      onDragOver={(e) => e.preventDefault()}
       onClick={() => onClick && onClick(reclamo)}
     >
-      {/* Top Row: Motivo + Update indicator */}
+      {/* Top Row: Motivo + badges */}
       <div className="card-header">
         <span className={`motivo-badge ${getMotivoBadgeClass(reclamo.motivo)}`}>{reclamo.motivo}</span>
         {reclamo.solicita_update && (
           <span className="update-request-badge" title="El vecino solicita una actualización">❗</span>
+        )}
+        {reclamo.notificado && (
+          <span className="notificado-badge" title="Mensaje enviado al vecino por WhatsApp">📨 Notificado</span>
         )}
       </div>
       <span className="card-date">{formatDate(reclamo.timestamp)}</span>
@@ -76,6 +82,17 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
           {workerName && <span className="assigned-worker">👤 {workerName}</span>}
           {reclamo.equipo && <span className="assigned-equipo">🏢 {reclamo.equipo}</span>}
         </div>
+      )}
+
+      {/* Suggestion button */}
+      {hasSuggestion && (
+        <button
+          className="card-suggestion-btn"
+          onClick={(e) => { e.stopPropagation(); onApplySuggestion(reclamo); }}
+          title="Aplicar sugerencia de asignación"
+        >
+          💡 {reclamo.suggested_equipo}{suggestionWorkerName ? ` · ${suggestionWorkerName}` : ''}
+        </button>
       )}
 
       {/* Footer: ID + Comments count + Actions */}

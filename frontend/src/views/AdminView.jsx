@@ -4,13 +4,15 @@ import { useUsers } from '../hooks/useUsers.js';
 import KanbanColumn from '../components/KanbanColumn';
 import ReclamoDetail from '../components/ReclamoDetail';
 import ResolveDialog from '../components/ResolveDialog.jsx';
+import DiscardDialog from '../components/DiscardDialog.jsx';
 import FilterBar from '../components/FilterBar';
 import './AdminView.css';
 
-const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardReclamo, resolveReclamo, getNextEstado, getPrevEstado, addComentario, fetchReclamo }) => {
+const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardReclamo, resolveReclamo, applySuggestion, getNextEstado, getPrevEstado, addComentario, fetchReclamo }) => {
   const { getWorkerName } = useUsers();
   const [selectedReclamo, setSelectedReclamo] = useState(null);
   const [resolveTarget, setResolveTarget] = useState(null); // id of reclamo pending resolution
+  const [discardTarget, setDiscardTarget] = useState(null); // id of reclamo pending discard
   const [draggedId, setDraggedId] = useState(null);
   const [filters, setFilters] = useState({ search: '', equipo: '', motivo: '', estado: '' });
 
@@ -63,14 +65,24 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
   };
 
   const handleDragStart = (e, id) => { setDraggedId(id); e.dataTransfer.effectAllowed = 'move'; };
-  const handleDrop = (e, newEstado) => { 
-    if (draggedId) { 
+  const handleDrop = (e, newEstado) => {
+    if (draggedId) {
+      if (newEstado === 'resuelto') {
+        setResolveTarget(draggedId);
+        setDraggedId(null);
+        return;
+      }
+      if (newEstado === 'descartado') {
+        setDiscardTarget(draggedId);
+        setDraggedId(null);
+        return;
+      }
       const r = reclamos.find(x => x.id === draggedId);
       if (checkCanMoveToAsignado(r, newEstado)) {
-        moveEstado(draggedId, newEstado); 
+        moveEstado(draggedId, newEstado);
       }
-      setDraggedId(null); 
-    } 
+      setDraggedId(null);
+    }
   };
 
   const handleMoveNext = (id) => {
@@ -97,6 +109,7 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
     const r = reclamos.find(x => x.id === id);
     if (!checkCanMoveToAsignado(r, estado)) return;
     if (estado === 'resuelto') { setResolveTarget(id); return; }
+    if (estado === 'descartado') { setDiscardTarget(id); return; }
     await moveEstado(id, estado);
     const full = await fetchReclamo(id);
     setSelectedReclamo(full);
@@ -105,6 +118,12 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
   const handleResolveConfirm = async (id, comentario) => {
     await resolveReclamo(id, comentario);
     setResolveTarget(null);
+    setSelectedReclamo(null);
+  };
+
+  const handleDiscardConfirm = async (id, notificar) => {
+    await discardReclamo(id, notificar);
+    setDiscardTarget(null);
     setSelectedReclamo(null);
   };
 
@@ -153,7 +172,8 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
               onCardClick={handleCardClick}
               onMoveNext={!isLast ? handleMoveNext : null}
               onMovePrev={!isFirst ? handleMovePrev : null}
-              onDiscard={discardReclamo}
+              onDiscard={(id) => setDiscardTarget(id)}
+              onApplySuggestion={applySuggestion}
               showArrows={true}
               getWorkerName={getWorkerName}
             />
@@ -177,6 +197,14 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
           reclamo={reclamos.find(r => r.id === resolveTarget)}
           onConfirm={handleResolveConfirm}
           onCancel={() => setResolveTarget(null)}
+        />
+      )}
+
+      {discardTarget && (
+        <DiscardDialog
+          reclamo={reclamos.find(r => r.id === discardTarget)}
+          onConfirm={handleDiscardConfirm}
+          onCancel={() => setDiscardTarget(null)}
         />
       )}
     </div>

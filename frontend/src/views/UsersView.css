@@ -90,3 +90,37 @@
   color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
 }
 .btn-reset-pwd:hover { background: #f0f6ff; color: #3b82f6; border-color: #3b82f6; }
+
+.btn-edit {
+  padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+  border: 1px solid var(--border-color); background: var(--bg-surface);
+  color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+}
+.btn-edit:hover { background: #fffbea; color: #b45309; border-color: #b45309; }
+
+.btn-delete {
+  padding: 4px 8px; border-radius: 6px; font-size: 0.85rem;
+  border: 1px solid #fca5a5; background: #fff5f5;
+  color: #dc2626; cursor: pointer; transition: all 0.2s;
+}
+.btn-delete:hover { background: #fca5a5; color: #7f1d1d; }
+
+.btn-cancel-edit {
+  padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+  border: 1px solid var(--border-color); background: var(--bg-surface);
+  color: var(--text-muted); cursor: pointer;
+}
+
+.row-editing td { background: var(--bg-hover, #f8fafc); padding: 6px 12px; }
+.edit-inline-input {
+  width: 100%; padding: 4px 8px; border-radius: 5px; font-size: 0.85rem;
+  border: 1px solid var(--border-color); background: var(--bg-main);
+  color: var(--text-primary);
+}
+.edit-inline-input:focus { outline: none; border-color: var(--accent-color, #3b82f6); }
+.edit-inline-select {
+  padding: 4px 8px; border-radius: 5px; font-size: 0.85rem;
+  border: 1px solid var(--border-color); background: var(--bg-main);
+  color: var(--text-primary); display: block; width: 100%;
+}
+.edit-error { color: #dc2626; font-size: 0.8rem; display: block; margin-bottom: 4px; }

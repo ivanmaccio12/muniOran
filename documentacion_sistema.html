@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentación del Sistema — MuniOran | Axis ST</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0f1115;
+      --surface: rgba(22, 26, 35, 0.85);
+      --surface2: rgba(30, 35, 48, 0.7);
+      --border: rgba(255,255,255,0.07);
+      --blue: #0045b9;
+      --cyan: #0dcaf0;
+      --text: #f0f2f5;
+      --muted: #8a95a3;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
+
+    .sidebar { display: none; }
+
+    /* ── MAIN ────────────────────────────────────── */
+    .main { max-width: 860px; margin: 0 auto; padding: 3.5rem 2.5rem; }
+
+    /* ── HEADER ──────────────────────────────────── */
+    .doc-header { border-bottom: 1px solid var(--border); padding-bottom: 2.5rem; margin-bottom: 3.5rem; background: radial-gradient(ellipse at 70% 50%, rgba(0,69,185,0.09) 0%, transparent 70%); }
+    .doc-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0,69,185,0.12); border: 1px solid rgba(0,69,185,0.3); color: var(--cyan); padding: 0.35rem 1rem; border-radius: 100px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.2rem; }
+    .doc-title { font-size: 2.8rem; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 0.8rem; }
+    .doc-title span { color: var(--blue); }
+    .doc-subtitle { font-size: 1.05rem; color: var(--muted); max-width: 600px; }
+    .doc-meta { display: flex; gap: 2rem; margin-top: 1.8rem; flex-wrap: wrap; }
+    .meta-item { font-size: 0.82rem; color: var(--muted); }
+    .meta-item strong { color: var(--text); display: block; font-size: 0.92rem; }
+
+    /* ── SECTIONS ────────────────────────────────── */
+    section { margin-bottom: 4rem; }
+    .section-label { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cyan); background: rgba(13,202,240,0.08); border: 1px solid rgba(13,202,240,0.2); padding: 0.3rem 0.9rem; border-radius: 100px; margin-bottom: 1rem; }
+    .section-title { font-size: 1.8rem; color: #fff; margin-bottom: 0.6rem; }
+    .section-desc { color: var(--muted); font-size: 0.97rem; margin-bottom: 1.8rem; max-width: 680px; }
+
+    /* ── CARDS ───────────────────────────────────── */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.8rem 2rem; margin-bottom: 1.2rem; }
+    .panel.accent { border-color: var(--blue); background: linear-gradient(135deg, rgba(0,69,185,0.07) 0%, var(--surface) 100%); }
+    .panel h3 { font-size: 1.1rem; color: #fff; margin-bottom: 0.6rem; }
+    .panel p { color: var(--muted); font-size: 0.93rem; }
+
+    /* ── GRID ────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+
+    /* ── STATS ───────────────────────────────────── */
+    .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem 1.6rem; text-align: center; }
+    .stat-icon { font-size: 1.6rem; color: var(--blue); margin-bottom: 0.6rem; display: block; }
+    .stat-value { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: #fff; line-height: 1; }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* ── FLOW ────────────────────────────────────── */
+    .flow { display: flex; align-items: center; overflow-x: auto; padding: 1rem 0; }
+    .flow-step { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; flex: 1; min-width: 90px; text-align: center; }
+    .flow-icon { width: 52px; height: 52px; background: rgba(0,69,185,0.15); border: 1px solid rgba(0,69,185,0.35); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--blue); }
+    .flow-label { font-size: 0.78rem; color: var(--muted); line-height: 1.3; }
+    .flow-label strong { color: var(--text); display: block; font-size: 0.83rem; }
+    .flow-arrow { color: rgba(0,69,185,0.45); font-size: 1rem; flex-shrink: 0; padding: 0 0.3rem; }
+
+    /* ── ROLES ───────────────────────────────────── */
+    .roles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .role-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; }
+    .role-badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem; }
+    .role-badge.admin { background: rgba(0,69,185,0.2); color: var(--blue); }
+    .role-badge.gestor { background: rgba(13,202,240,0.15); color: var(--cyan); }
+    .role-badge.operador { background: rgba(34,197,94,0.15); color: var(--success); }
+    .role-card ul { list-style: none; }
+    .role-card ul li { font-size: 0.85rem; color: var(--muted); padding: 0.3rem 0; display: flex; gap: 0.5rem; align-items: flex-start; }
+    .role-card ul li::before { content: "·"; color: var(--blue); font-weight: bold; flex-shrink: 0; }
+
+    /* ── API TABLE ────────────────────────────────── */
+    .api-table { width: 100%; border-collapse: collapse; }
+    .api-table th { text-align: left; padding: 0.7rem 1rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); border-bottom: 1px solid var(--border); }
+    .api-table td { padding: 0.75rem 1rem; font-size: 0.88rem; color: var(--muted); border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+    .api-table tr:last-child td { border-bottom: none; }
+    .method { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 5px; font-family: monospace; font-size: 0.78rem; font-weight: 700; }
+    .method.get { background: rgba(34,197,94,0.15); color: var(--success); }
+    .method.post { background: rgba(0,69,185,0.18); color: #6fa3ff; }
+    .method.patch { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .method.delete { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .endpoint { font-family: monospace; color: #c9d1e8; font-size: 0.85rem; }
+    .auth-chip { display: inline-block; font-size: 0.7rem; padding: 0.1rem 0.45rem; border-radius: 4px; font-weight: 600; }
+    .auth-chip.req { background: rgba(0,69,185,0.2); color: var(--cyan); }
+    .auth-chip.pub { background: rgba(34,197,94,0.15); color: var(--success); }
+
+    /* ── STEPS ───────────────────────────────────── */
+    .steps { display: flex; flex-direction: column; gap: 1rem; }
+    .step { display: flex; gap: 1.2rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; }
+    .step-num { width: 32px; height: 32px; flex-shrink: 0; background: rgba(0,69,185,0.18); border: 1px solid rgba(0,69,185,0.35); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.9rem; color: var(--blue); }
+    .step-body h4 { color: #fff; font-size: 0.95rem; margin-bottom: 0.25rem; }
+    .step-body p { color: var(--muted); font-size: 0.87rem; }
+
+    /* ── TECH PILLS ──────────────────────────────── */
+    .tech-list { list-style: none; display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.8rem; }
+    .tech-pill { display: flex; align-items: center; gap: 0.4rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.9rem; font-size: 0.82rem; color: var(--text); }
+    .tech-pill i { color: var(--blue); font-size: 0.75rem; }
+
+    /* ── CHECKLIST ───────────────────────────────── */
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .checklist li { display: flex; align-items: flex-start; gap: 0.7rem; font-size: 0.9rem; color: var(--muted); }
+    .checklist li .check { color: var(--success); flex-shrink: 0; margin-top: 2px; }
+
+    /* ── CALLOUT ─────────────────────────────────── */
+    .callout { border-radius: 10px; padding: 1rem 1.2rem; display: flex; gap: 0.8rem; align-items: flex-start; margin-bottom: 1rem; }
+    .callout.info { background: rgba(0,69,185,0.1); border: 1px solid rgba(0,69,185,0.25); }
+    .callout.warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); }
+    .callout.danger { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25); }
+    .callout i { margin-top: 0.1rem; flex-shrink: 0; }
+    .callout.info i { color: var(--cyan); }
+    .callout.warning i { color: var(--warning); }
+    .callout.danger i { color: var(--danger); }
+    .callout p { font-size: 0.88rem; color: var(--muted); }
+    .callout p strong { color: var(--text); }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    .doc-footer { border-top: 1px solid var(--border); padding: 2.5rem 0 1rem; margin-top: 4rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; }
+    .footer-logo span { color: var(--blue); }
+    .footer-note { font-size: 0.78rem; color: var(--muted); }
+
+    code { font-family: 'Courier New', monospace; background: rgba(0,69,185,0.12); color: #6fa3ff; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.83em; }
+
+    @media (max-width: 700px) {
+      .main { padding: 2rem 1.2rem; }
+      .grid-2, .grid-3, .roles-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">AXIS<span>.ST</span></div>
+  <div class="sidebar-client">Municipalidad de Orán</div>
+
+  <div class="nav-section">Introducción</div>
+  <a class="nav-link" href="#overview"><i class="fa-solid fa-house-city"></i> Visión General</a>
+  <a class="nav-link" href="#arquitectura"><i class="fa-solid fa-diagram-project"></i> Arquitectura</a>
+  <a class="nav-link" href="#stack"><i class="fa-solid fa-layer-group"></i> Stack Tecnológico</a>
+
+  <div class="nav-section">Sistema</div>
+  <a class="nav-link" href="#chatbot"><i class="fa-brands fa-whatsapp"></i> Bot WhatsApp</a>
+  <a class="nav-link" href="#reclamos"><i class="fa-solid fa-clipboard-list"></i> Flujo de Reclamos</a>
+  <a class="nav-link" href="#kanban"><i class="fa-solid fa-table-columns"></i> Panel Kanban</a>
+
+  <div class="nav-section">Administración</div>
+  <a class="nav-link" href="#roles"><i class="fa-solid fa-users-gear"></i> Roles y Permisos</a>
+  <a class="nav-link" href="#api"><i class="fa-solid fa-plug-circle-bolt"></i> API Reference</a>
+  <a class="nav-link" href="#limitaciones"><i class="fa-solid fa-triangle-exclamation"></i> Limitaciones</a>
+  <a class="nav-link" href="#faq"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+</nav>
+
+<div class="main">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="doc-badge"><i class="fa-solid fa-file-lines"></i> Documentación del Sistema v2.0</div>
+    <h1 class="doc-title">Sistema <span>MuniOran</span></h1>
+    <p class="doc-subtitle">Bot de atención ciudadana por WhatsApp + Panel de gestión de reclamos Kanban. Desarrollado por Axis ST para la Municipalidad de Orán.</p>
+    <div class="doc-meta">
+      <div class="meta-item"><strong>Versión</strong>2.0.0 — Producción</div>
+      <div class="meta-item"><strong>Actualizado</strong>Marzo 2026</div>
+      <div class="meta-item"><strong>Desarrollador</strong>Axis ST</div>
+    </div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="section-label"><i class="fa-solid fa-house-city"></i> Visión General</div>
+    <h2 class="section-title">¿Qué es el Sistema MuniOran?</h2>
+    <p class="section-desc">MuniOran es una plataforma de atención ciudadana inteligente compuesta por dos módulos integrados que funcionan en conjunto 24/7.</p>
+
+    <div class="grid-2">
+      <div class="panel accent">
+        <h3><i class="fa-brands fa-whatsapp" style="color:#22c55e;margin-right:0.5rem"></i>Bot WhatsApp IA</h3>
+        <p>Atiende consultas ciudadanas sobre trámites, servicios, pagos y reclamos del municipio. Responde en lenguaje natural gracias a Claude (Anthropic), con información oficial de <code>oran.gob.ar</code>. Soporta texto, imágenes, audio con transcripción automática y ubicación GPS.</p>
+      </div>
+      <div class="panel accent">
+        <h3><i class="fa-solid fa-table-columns" style="color:var(--cyan);margin-right:0.5rem"></i>Panel Kanban de Reclamos</h3>
+        <p>Interfaz web para gestores y operarios municipales. Permite recibir, asignar, escalar y resolver reclamos ciudadanos. Incluye sugerencia de asignación con inteligencia artificial y notificación automática por WhatsApp al vecino al cerrar un caso.</p>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-top:1.2rem">
+      <div class="stat-card">
+        <span class="stat-icon"><i class="fa-solid fa-clock"></i></span>
+        <div class="stat-value">24/7</div>
+        <div class="stat-label">Atención automática sin interrupciones</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon"><i class="fa-solid fa-bolt"></i></span>
+        <div class="stat-value">&lt; 3s</div>
+        <div class="stat-label">Tiempo de respuesta promedio del bot</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon"><i class="fa-solid fa-shield-halved"></i></span>
+        <div class="stat-value">100%</div>
+        <div class="stat-label">API oficial de WhatsApp (Meta)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA -->
+  <section id="arquitectura">
+    <div class="section-label"><i class="fa-solid fa-diagram-project"></i> Arquitectura</div>
+    <h2 class="section-title">Cómo funciona el sistema</h2>
+    <p class="section-desc">El bot y el panel Kanban comparten el mismo servidor Node.js y base de datos. N8N actúa como orquestador de mensajería entre WhatsApp y el backend.</p>
+
+    <div class="panel" style="overflow-x:auto">
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-icon"><i class="fa-brands fa-whatsapp"></i></div>
+          <div class="flow-label"><strong>Vecino</strong>Mensaje WA</div>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="flow-step">
+          <div class="flow-icon" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3)"><i class="fa-brands fa-meta" style="color:var(--success)"></i></div>
+          <div class="flow-label"><strong>WhatsApp</strong>Cloud API (Meta)</div>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="flow-step">
+          <div class="flow-icon" style="background:rgba(13,202,240,0.1);border-color:rgba(13,202,240,0.3)"><i class="fa-solid fa-diagram-project" style="color:var(--cyan)"></i></div>
+          <div class="flow-label"><strong>N8N</strong>Orquestador</div>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="flow-step">
+          <div class="flow-icon"><i class="fa-solid fa-server"></i></div>
+          <div class="flow-label"><strong>API Node.js</strong>Backend</div>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="flow-step">
+          <div class="flow-icon" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3)"><i class="fa-solid fa-brain" style="color:var(--warning)"></i></div>
+          <div class="flow-label"><strong>Claude AI</strong>Anthropic</div>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="flow-step">
+          <div class="flow-icon"><i class="fa-brands fa-whatsapp"></i></div>
+          <div class="flow-label"><strong>Respuesta</strong>Al vecino</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info" style="margin-top:1.2rem">
+      <i class="fa-solid fa-circle-info"></i>
+      <p><strong>Reclamos:</strong> Cuando el bot detecta que un vecino quiere reportar un problema, lo guía paso a paso (descripción → foto → ubicación) y registra el reclamo automáticamente. Aparece al instante en el panel Kanban bajo la columna "Nuevo".</p>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section id="stack">
+    <div class="section-label"><i class="fa-solid fa-layer-group"></i> Stack Tecnológico</div>
+    <h2 class="section-title">Tecnologías del sistema</h2>
+    <p class="section-desc">Stack completamente moderno desplegado en servidor VPS con dominio propio y certificado SSL automático.</p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3 style="margin-bottom:0.8rem">Backend</h3>
+        <ul class="tech-list">
+          <li class="tech-pill"><i class="fa-brands fa-node-js"></i> Node.js + Express</li>
+          <li class="tech-pill"><i class="fa-solid fa-database"></i> SQLite</li>
+          <li class="tech-pill"><i class="fa-solid fa-key"></i> JWT (autenticación)</li>
+          <li class="tech-pill"><i class="fa-solid fa-envelope"></i> Nodemailer</li>
+          <li class="tech-pill"><i class="fa-solid fa-infinity"></i> PM2 (proceso continuo)</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:0.8rem">Panel de Gestión</h3>
+        <ul class="tech-list">
+          <li class="tech-pill"><i class="fa-brands fa-react"></i> React + Vite</li>
+          <li class="tech-pill"><i class="fa-solid fa-arrows-up-down-left-right"></i> Drag & Drop</li>
+          <li class="tech-pill"><i class="fa-solid fa-palette"></i> CSS Modules</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:0.8rem">IA y Mensajería</h3>
+        <ul class="tech-list">
+          <li class="tech-pill"><i class="fa-solid fa-brain"></i> Claude (Anthropic)</li>
+          <li class="tech-pill"><i class="fa-solid fa-microphone"></i> Whisper / OpenAI (audios)</li>
+          <li class="tech-pill"><i class="fa-brands fa-whatsapp"></i> WhatsApp Cloud API</li>
+          <li class="tech-pill"><i class="fa-solid fa-diagram-project"></i> N8N (orquestador)</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:0.8rem">Infraestructura</h3>
+        <ul class="tech-list">
+          <li class="tech-pill"><i class="fa-brands fa-docker"></i> Docker</li>
+          <li class="tech-pill"><i class="fa-solid fa-shield"></i> Traefik (proxy reverso)</li>
+          <li class="tech-pill"><i class="fa-brands fa-linux"></i> VPS Linux</li>
+          <li class="tech-pill"><i class="fa-solid fa-lock"></i> SSL/HTTPS automático</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHATBOT -->
+  <section id="chatbot">
+    <div class="section-label"><i class="fa-brands fa-whatsapp"></i> Bot WhatsApp</div>
+    <h2 class="section-title">Capacidades del bot ciudadano</h2>
+    <p class="section-desc">El bot responde en lenguaje natural sobre todos los servicios del municipio. Cada conversación mantiene contexto durante la sesión activa.</p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3><i class="fa-solid fa-comments" style="color:var(--blue);margin-right:0.5rem"></i>Temas que maneja</h3>
+        <ul class="checklist" style="margin-top:0.8rem">
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Licencias de conducir (nueva, renovación, extravío)</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Habilitaciones comerciales (apertura, traslado, cierre)</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Pagos: automotor, inmobiliario, TSP, actividades</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Alumbrado público y reclamos de luminarias</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Recolección de residuos y contenedores</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Bienestar animal, turismo, deportes, juventud</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Transparencia, ordenanzas, boletín oficial</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Cine municipal, polo tecnológico</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Registro de vehículos y eventos</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3><i class="fa-solid fa-file-import" style="color:var(--cyan);margin-right:0.5rem"></i>Formatos de mensaje soportados</h3>
+        <ul class="checklist" style="margin-top:0.8rem">
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Texto libre en español</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Imágenes y fotos adjuntas</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Documentos y archivos</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Audios de voz (transcripción automática con IA)</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Stickers</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Ubicación GPS en tiempo real</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Dirección escrita manualmente</li>
+        </ul>
+      </div>
+    </div>
+
+
+    <div class="callout info" style="margin-top:1.2rem">
+      <i class="fa-solid fa-shield-halved"></i>
+      <p><strong>Alcance del bot:</strong> El asistente está diseñado exclusivamente para responder consultas relacionadas con los servicios, trámites e información de la Municipalidad de Orán. No responderá preguntas ajenas a ese propósito, ni emitirá opiniones, comentarios o posicionamientos de índole política bajo ninguna circunstancia.</p>
+    </div>
+  </section>
+
+  <!-- RECLAMOS -->
+  <section id="reclamos">
+    <div class="section-label"><i class="fa-solid fa-clipboard-list"></i> Flujo de Reclamos</div>
+    <h2 class="section-title">Cómo se procesa un reclamo</h2>
+    <p class="section-desc">El vecino es guiado automáticamente por el bot. El reclamo queda registrado y el equipo municipal lo gestiona desde el Kanban hasta su resolución.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>El vecino describe el problema por WhatsApp</h4>
+          <p>El bot detecta la intención de reclamo y activa el flujo guiado. Solicita datos básicos: tipo de problema y descripción detallada.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Foto del problema (opcional)</h4>
+          <p>El bot solicita una foto de evidencia. El vecino puede enviarla o saltar este paso. Si la envía, queda adjunta al reclamo.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Ubicación: GPS o dirección manual</h4>
+          <p>El vecino comparte su ubicación GPS desde WhatsApp, o escribe la dirección manualmente. Ambas opciones son válidas.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Reclamo creado — aparece en el Kanban como "Nuevo"</h4>
+          <p>El sistema registra el reclamo y el bot confirma al vecino con un resumen de lo que reportó.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Gestor asigna área y operador responsable</h4>
+          <p>Desde el Kanban, el gestor mueve el reclamo a "En proceso" y lo asigna. El botón <code>💡</code> sugiere automáticamente el área y la persona con menor carga de trabajo usando IA.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h4>Resolución con notificación al vecino</h4>
+          <p>Al resolver, el gestor completa un mensaje personalizado que se intenta enviar por WhatsApp al vecino. Ver limitaciones de Meta en la sección correspondiente.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warning" style="margin-top:1.5rem">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p><strong>Descarte con opciones:</strong> Al descartar un reclamo, el gestor puede elegir notificar al vecino con una explicación, o descartarlo silenciosamente sin generar ningún mensaje.</p>
+    </div>
+  </section>
+
+  <!-- KANBAN -->
+  <section id="kanban">
+    <div class="section-label"><i class="fa-solid fa-table-columns"></i> Panel Kanban</div>
+    <h2 class="section-title">Guía del panel de gestión</h2>
+    <p class="section-desc">Accesible desde cualquier navegador con usuario y contraseña. No requiere instalación adicional en las computadoras del municipio.</p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3 style="margin-bottom:1rem">🗂 Columnas del Kanban</h3>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:0.7rem">
+          <li style="display:flex;align-items:center;gap:0.8rem;font-size:0.9rem">
+            <span style="background:rgba(0,69,185,0.2);color:var(--blue);padding:0.2rem 0.7rem;border-radius:6px;font-size:0.75rem;font-weight:700">NUEVO</span>
+            <span style="color:var(--muted)">Ingresado, sin asignar aún</span>
+          </li>
+          <li style="display:flex;align-items:center;gap:0.8rem;font-size:0.9rem">
+            <span style="background:rgba(245,158,11,0.2);color:var(--warning);padding:0.2rem 0.7rem;border-radius:6px;font-size:0.75rem;font-weight:700">EN PROCESO</span>
+            <span style="color:var(--muted)">Asignado a área / operador</span>
+          </li>
+          <li style="display:flex;align-items:center;gap:0.8rem;font-size:0.9rem">
+            <span style="background:rgba(13,202,240,0.15);color:var(--cyan);padding:0.2rem 0.7rem;border-radius:6px;font-size:0.75rem;font-weight:700">ESCALADO</span>
+            <span style="color:var(--muted)">Requiere atención urgente o de un superior</span>
+          </li>
+          <li style="display:flex;align-items:center;gap:0.8rem;font-size:0.9rem">
+            <span style="background:rgba(34,197,94,0.15);color:var(--success);padding:0.2rem 0.7rem;border-radius:6px;font-size:0.75rem;font-weight:700">RESUELTO</span>
+            <span style="color:var(--muted)">Cerrado y notificado</span>
+          </li>
+          <li style="display:flex;align-items:center;gap:0.8rem;font-size:0.9rem">
+            <span style="background:rgba(239,68,68,0.15);color:var(--danger);padding:0.2rem 0.7rem;border-radius:6px;font-size:0.75rem;font-weight:700">DESCARTADO</span>
+            <span style="color:var(--muted)">No procede (con o sin notificación)</span>
+          </li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:1rem">⚡ Funciones clave</h3>
+        <ul class="checklist">
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Arrastrar y soltar reclamos entre columnas</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Botón 💡 sugerencia de asignación por IA</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Badge "📨 Notificado" en reclamos resueltos</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Template editable al momento de resolver</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Comentarios internos por reclamo</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Gestión de usuarios, áreas y equipos</li>
+          <li><span class="check"><i class="fa-solid fa-check-circle"></i></span>Eliminación segura de usuarios (confirmación en 2 pasos)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROLES -->
+  <section id="roles">
+    <div class="section-label"><i class="fa-solid fa-users-gear"></i> Roles y Permisos</div>
+    <h2 class="section-title">Control de acceso</h2>
+    <p class="section-desc">Tres niveles de acceso para diferentes responsabilidades dentro del municipio. Los usuarios son gestionados desde el propio panel Kanban.</p>
+
+    <div class="roles-grid">
+      <div class="role-card">
+        <span class="role-badge admin"><i class="fa-solid fa-crown" style="margin-right:4px"></i>Administrador</span>
+        <ul>
+          <li>Gestión completa de usuarios</li>
+          <li>Eliminar cualquier usuario</li>
+          <li>Ver y editar todos los reclamos</li>
+          <li>Configurar áreas y equipos</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <span class="role-badge gestor"><i class="fa-solid fa-user-tie" style="margin-right:4px"></i>Gestor</span>
+        <ul>
+          <li>Crear y editar usuarios</li>
+          <li>Asignar reclamos a operadores</li>
+          <li>Mover entre columnas y resolver</li>
+          <li>Notificar vecinos al cerrar casos</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <span class="role-badge operador"><i class="fa-solid fa-user" style="margin-right:4px"></i>Operador</span>
+        <ul>
+          <li>Ver reclamos de su área</li>
+          <li>Agregar comentarios internos</li>
+          <li>Actualizar el estado de avance</li>
+          <li>Sin acceso a administración</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- API -->
+  <section id="api">
+    <div class="section-label"><i class="fa-solid fa-plug-circle-bolt"></i> API Reference</div>
+    <h2 class="section-title">Endpoints disponibles</h2>
+    <p class="section-desc">Todos los endpoints bajo <code>/api/</code> requieren header <code>Authorization: Bearer &lt;token&gt;</code> salvo los marcados como público.</p>
+
+    <div class="panel" style="overflow-x:auto;padding:0">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>Método</th><th>Endpoint</th><th>Descripción</th><th>Auth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="method get">GET</span></td><td class="endpoint">/health</td><td>Estado del servicio</td><td><span class="auth-chip pub">Público</span></td></tr>
+          <tr><td><span class="method post">POST</span></td><td class="endpoint">/chat</td><td>Enviar mensaje al bot (usado por N8N)</td><td><span class="auth-chip pub">Público</span></td></tr>
+          <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/auth/login</td><td>Login → devuelve JWT</td><td><span class="auth-chip pub">Público</span></td></tr>
+          <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/auth/me</td><td>Perfil del usuario autenticado</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/users</td><td>Listar usuarios</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/users</td><td>Crear usuario</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method patch">PATCH</span></td><td class="endpoint">/api/users/:id</td><td>Actualizar usuario</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method delete">DELETE</span></td><td class="endpoint">/api/users/:id</td><td>Eliminar usuario (solo admin)</td><td><span class="auth-chip req">JWT admin</span></td></tr>
+          <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/reclamos</td><td>Listar reclamos</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/reclamos</td><td>Crear reclamo manual</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/reclamos/:id</td><td>Detalle de un reclamo</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method patch">PATCH</span></td><td class="endpoint">/api/reclamos/:id</td><td>Actualizar / asignar / resolver</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/reclamos/:id/comentarios</td><td>Comentarios internos</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/reclamos/:id/comentarios</td><td>Agregar comentario</td><td><span class="auth-chip req">JWT</span></td></tr>
+          <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/reclamos/:id/solicitar-update</td><td>Solicitar actualización al vecino por WhatsApp</td><td><span class="auth-chip req">JWT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- COMUNICACION -->
+  <section id="limitaciones">
+    <div class="section-label"><i class="fa-solid fa-paper-plane"></i> Comunicación con Vecinos</div>
+    <h2 class="section-title">Modalidades de notificación saliente</h2>
+    <p class="section-desc">La plataforma cuenta con dos modalidades complementarias para notificar a los vecinos, cubriendo la atención inmediata y el seguimiento proactivo de reclamos.</p>
+
+    <div class="grid-2">
+      <div class="panel accent">
+        <h3><i class="fa-solid fa-reply" style="color:var(--success);margin-right:0.5rem"></i>Respuesta dentro de conversación activa</h3>
+        <p>Cuando un vecino interactuó con el bot recientemente, el sistema le envía el mensaje de resolución o actualización directamente por WhatsApp de forma inmediata. Este es el flujo habitual para la gran mayoría de los reclamos gestionados en el día, y no requiere configuración adicional.</p>
+      </div>
+      <div class="panel accent">
+        <h3><i class="fa-solid fa-paper-plane" style="color:var(--cyan);margin-right:0.5rem"></i>Plantillas de Mensaje Aprobadas (HSM)</h3>
+        <p>Para notificar a un vecino de forma proactiva —por ejemplo, en reclamos resueltos días después del contacto inicial— la plataforma soporta el envío de <strong>Plantillas HSM</strong> aprobadas por Meta. Son mensajes prediseñados que permiten retomar conversaciones de manera segura, sin riesgo de restricciones para el número del municipio.</p>
+      </div>
+    </div>
+
+    <div class="callout info" style="margin-top:0.8rem">
+      <i class="fa-solid fa-circle-info"></i>
+      <p><strong>¿Cuándo usar plantillas HSM?</strong> Se recomienda su uso para resoluciones tardías, campañas de seguimiento o cualquier comunicación iniciada por el municipio. Axis ST asiste en la creación, redacción y proceso de aprobación de las plantillas ante Meta según los casos de uso del municipio.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="section-label"><i class="fa-solid fa-circle-question"></i> FAQ</div>
+    <h2 class="section-title">Preguntas frecuentes</h2>
+
+    <div class="panel" style="margin-bottom:0.8rem">
+      <h3>¿Qué pasa si el bot no sabe responder algo?</h3>
+      <p style="margin-top:0.4rem">El bot reconoce sus límites y es transparente con el vecino: le indica que no cuenta con información suficiente sobre ese tema y sugiere que se comunique con la oficina municipal correspondiente para obtener asistencia.</p>
+    </div>
+    <div class="panel" style="margin-bottom:0.8rem">
+      <h3>¿Los datos de los vecinos se almacenan?</h3>
+      <p style="margin-top:0.4rem">Los reclamos y su información quedan guardados en la base de datos del sistema, alojada en el servidor municipal. Los mensajes de conversación se almacenan temporalmente durante la sesión activa y luego se liberan. Axis ST no tiene acceso a los datos de producción.</p>
+    </div>
+    <div class="panel" style="margin-bottom:0.8rem">
+      <h3>¿Cómo se accede al panel Kanban?</h3>
+      <p style="margin-top:0.4rem">Desde cualquier navegador web moderno (Chrome, Firefox, Edge). El acceso requiere usuario y contraseña. No se necesita instalar ninguna aplicación. Los usuarios son creados por el administrador del sistema desde el propio panel.</p>
+    </div>
+    <div class="panel" style="margin-bottom:0.8rem">
+      <h3>¿Qué pasa si el servidor tiene un problema?</h3>
+      <p style="margin-top:0.4rem">El proceso del servidor está administrado por PM2, que reinicia automáticamente el servicio ante cualquier falla inesperada. Axis ST es responsable del monitoreo y mantenimiento del servidor durante la vigencia del contrato de soporte.</p>
+    </div>
+    <div class="panel">
+      <h3>¿Se puede actualizar el contenido que conoce el bot?</h3>
+      <p style="margin-top:0.4rem">Sí. El bot se mantiene actualizado de dos maneras: por un lado, Axis ST actualiza el conocimiento base cuando cambian trámites, requisitos o links del portal <code>oran.gob.ar</code>; por otro, el sistema consume en tiempo real ciertos endpoints proporcionados por el equipo del municipio, lo que significa que cuando la información en esos servicios se actualiza, el bot responde automáticamente con los datos más recientes sin intervención manual.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div>
+      <div class="footer-logo">AXIS<span>.ST</span></div>
+      <div class="footer-note" style="margin-top:0.3rem">Soluciones Tecnológicas · Inteligencia Artificial · Automatización</div>
+    </div>
+    <div style="text-align:right">
+      <div class="footer-note">Sistema MuniOran v2.0.0</div>
+      <div class="footer-note">Municipalidad de Orán · Salta, Argentina · Marzo 2026</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

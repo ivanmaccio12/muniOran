@@ -72,12 +72,24 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
         {/* Photos */}
         {reclamo.fotos && reclamo.fotos.length > 0 && (
           <div className="detail-section">
-            <h4>📷 Fotos adjuntas</h4>
+            <h4>📷 Fotos adjuntas ({reclamo.fotos.length})</h4>
             <div className="detail-photos">
               {reclamo.fotos.map((foto, i) => (
-                <a key={i} href={foto} target="_blank" rel="noopener noreferrer" className="detail-photo-link">
-                  <img src={foto} alt={`Adjunto ${i + 1}`} />
-                </a>
+                <div key={i} className="detail-photo-item">
+                  <a href={foto} target="_blank" rel="noopener noreferrer" className="detail-photo-link">
+                    <img src={foto} alt={`Adjunto ${i + 1}`} />
+                  </a>
+                  <a
+                    href={foto}
+                    download={`reclamo-${reclamo.id}-foto-${i + 1}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="detail-photo-download"
+                    title="Descargar foto"
+                  >
+                    ⬇ Descargar
+                  </a>
+                </div>
               ))}
             </div>
           </div>

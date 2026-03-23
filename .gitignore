@@ -23,3 +23,10 @@ yarn-error.log*
 
 # Agent
 .agent/
+
+# SQLite temp files (WAL mode)
+*.sqlite-shm
+*.sqlite-wal
+
+# Database data (no subir datos de producción)
+data/

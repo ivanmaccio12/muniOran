@@ -9,7 +9,7 @@ import {
   listComentarios, postComentario, solicitarUpdate, postReclamo,
 } from './controllers/reclamosController.js';
 import { postLogin, getMe } from './controllers/authController.js';
-import { listUsers, postUser, patchUser } from './controllers/usersController.js';
+import { listUsers, postUser, patchUser, deleteUser } from './controllers/usersController.js';
 import { requireAuth, requireRole } from './middleware/authMiddleware.js';
 
 dotenv.config();
@@ -32,10 +32,11 @@ app.post('/chat', chatController);
 app.post('/api/auth/login', postLogin);
 app.get('/api/auth/me', requireAuth, getMe);
 
-// ============= USERS API (admin only) =============
+// ============= USERS API =============
 app.get('/api/users', requireAuth, requireRole('admin', 'gestor'), listUsers);
-app.post('/api/users', requireAuth, requireRole('admin'), postUser);
-app.patch('/api/users/:id', requireAuth, requireRole('admin'), patchUser);
+app.post('/api/users', requireAuth, requireRole('admin', 'gestor'), postUser);
+app.patch('/api/users/:id', requireAuth, requireRole('admin', 'gestor'), patchUser);
+app.delete('/api/users/:id', requireAuth, requireRole('admin'), deleteUser);
 
 // ============= RECLAMOS API =============
 app.get('/api/reclamos', requireAuth, listReclamos);

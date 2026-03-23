@@ -52,11 +52,25 @@ export const useUsers = () => {
     return json;
   };
 
+  const deleteUser = async (id, force = false) => {
+    const url = force ? `${API_BASE}/users/${id}?force=true` : `${API_BASE}/users/${id}`;
+    const res = await fetch(url, { method: 'DELETE', headers: authHeaders() });
+    const json = await res.json();
+    if (!res.ok) {
+      const err = new Error(json.error || 'Error al eliminar usuario');
+      err.requiresForce = json.requiresForce || false;
+      err.activeReclamos = json.activeReclamos || [];
+      throw err;
+    }
+    await fetchUsers();
+    return json;
+  };
+
   // Helper: get worker name by ID
   const getWorkerName = (id) => users.find(u => u.id === id)?.nombre || id || '—';
 
   // Filtered: only active equipo users
   const workers = users.filter(u => u.rol === 'equipo' && u.activo);
 
-  return { users, workers, loading, fetchUsers, createUser, updateUser, getWorkerName };
+  return { users, workers, loading, fetchUsers, createUser, updateUser, deleteUser, getWorkerName };
 };

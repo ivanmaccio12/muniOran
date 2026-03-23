@@ -29,7 +29,7 @@ export const getReclamo = (req, res) => {
 export const patchReclamo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { comentario_resolucion, ...fields } = req.body;
+    const { comentario_resolucion, notificar, ...fields } = req.body;
 
     // Validación: pasar a resuelto requiere comentario
     if (fields.estado === 'resuelto') {
@@ -67,8 +67,9 @@ export const patchReclamo = async (req, res) => {
       if (worker) sendAssignmentEmail(worker, updated).catch(() => {});
     }
 
-    // WhatsApp al vecino cuando se resuelve o descarta
-    if (fields.estado === 'resuelto' || fields.estado === 'descartado') {
+    // WhatsApp al vecino cuando se resuelve o descarta (con opción de no notificar en descarte)
+    const debeNotificar = notificar !== false; // true por defecto
+    if (fields.estado === 'resuelto' || (fields.estado === 'descartado' && debeNotificar)) {
       let mensaje;
       if (fields.estado === 'resuelto' && comentario_resolucion) {
         // Enviar exactamente el mensaje modificado por el usuario
@@ -78,6 +79,7 @@ export const patchReclamo = async (req, res) => {
         mensaje = `🏛️ *Municipalidad de Orán*\n\nHola *${updated.nombre_apellido}*, te informamos que tu reclamo ha sido *${estadoLabel}*.\n\nMotivo: ${updated.motivo}\nDescripción: ${updated.descripcion}\nDirección: ${updated.direccion}`;
       }
       sendWhatsApp(updated.telefono, mensaje);
+      updateReclamo(id, { notificado: 1 });
     }
 
     res.json(getReclamoById(id));
