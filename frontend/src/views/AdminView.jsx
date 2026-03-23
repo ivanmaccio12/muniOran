@@ -174,7 +174,7 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
 
       {resolveTarget && (
         <ResolveDialog
-          reclamoId={resolveTarget}
+          reclamo={reclamos.find(r => r.id === resolveTarget)}
           onConfirm={handleResolveConfirm}
           onCancel={() => setResolveTarget(null)}
         />

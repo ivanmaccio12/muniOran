@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import './ResolveDialog.css';
 
-const ResolveDialog = ({ reclamoId, onConfirm, onCancel }) => {
-  const [comentario, setComentario] = useState('');
+const ResolveDialog = ({ reclamo, onConfirm, onCancel }) => {
+  const defaultText = reclamo ? `¡Hola! Nos comunicamos desde la Municipalidad de Orán. Te informamos que tu reclamo por ${reclamo.motivo} en ${reclamo.direccion} ya fue resuelto. ¡Gracias por ayudarnos a mejorar la ciudad!` : '';
+  const [comentario, setComentario] = useState(defaultText);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -11,7 +12,7 @@ const ResolveDialog = ({ reclamoId, onConfirm, onCancel }) => {
     setSaving(true);
     setError('');
     try {
-      await onConfirm(reclamoId, comentario.trim());
+      await onConfirm(reclamo.id, comentario.trim());
     } catch (err) {
       setError(err.message || 'Error al resolver el reclamo');
       setSaving(false);

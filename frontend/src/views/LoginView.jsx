@@ -17,7 +17,7 @@ const LoginView = () => {
     setLoading(true);
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/mis-reclamos');
     } catch (err) {
       setError(err.message);
     } finally {

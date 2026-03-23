@@ -63,10 +63,6 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
 
       {/* Meta */}
       <div className="card-meta">
-        <div className="card-meta-item">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span>{reclamo.nombre_apellido}</span>
-        </div>
         <div className="card-meta-item card-meta-link" onClick={(e) => { e.stopPropagation(); window.open(mapsUrl, '_blank'); }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           <span>{reclamo.direccion}</span>

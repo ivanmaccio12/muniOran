@@ -69,27 +69,14 @@ export const patchReclamo = async (req, res) => {
 
     // WhatsApp al vecino cuando se resuelve o descarta
     if (fields.estado === 'resuelto' || fields.estado === 'descartado') {
-      const refetch = getReclamoById(id);
-      const comentariosTexto = refetch.comentarios?.length > 0
-        ? refetch.comentarios.map(c => `  - [${c.autor}] ${c.texto}`).join('\n')
-        : '  (sin comentarios)';
-      const estadoLabel = fields.estado === 'resuelto' ? 'RESUELTO ✅' : 'DESCARTADO ❌';
-      const mensaje = [
-        `🏛️ *Municipalidad de Orán — Actualización de Reclamo*`,
-        ``,
-        `Hola *${updated.nombre_apellido}*, te informamos que tu reclamo quedó como *${estadoLabel}*.`,
-        ``,
-        `📋 *Detalle*`,
-        `• ID: ${updated.id}`,
-        `• Motivo: ${updated.motivo}`,
-        `• Descripción: ${updated.descripcion}`,
-        `• Dirección: ${updated.direccion}`,
-        ``,
-        `💬 *Comentarios del equipo*`,
-        comentariosTexto,
-        ``,
-        `Gracias por comunicarte con El Municipal.`,
-      ].join('\n');
+      let mensaje;
+      if (fields.estado === 'resuelto' && comentario_resolucion) {
+        // Enviar exactamente el mensaje modificado por el usuario
+        mensaje = comentario_resolucion;
+      } else {
+        const estadoLabel = 'DESCARTADO ❌';
+        mensaje = `🏛️ *Municipalidad de Orán*\n\nHola *${updated.nombre_apellido}*, te informamos que tu reclamo ha sido *${estadoLabel}*.\n\nMotivo: ${updated.motivo}\nDescripción: ${updated.descripcion}\nDirección: ${updated.direccion}`;
+      }
       sendWhatsApp(updated.telefono, mensaje);
     }
 

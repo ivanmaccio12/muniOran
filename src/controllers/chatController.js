@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getSystemPrompt } from '../config/systemPrompt.js';
 import { getHistory, saveHistory } from '../services/conversationService.js';
-import { createReclamo, searchKnowledge, getReclamoById } from '../services/db.js';
+import { createReclamo, searchKnowledge, getReclamoById, getExistingMotivos } from '../services/db.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -55,26 +55,22 @@ export const chatController = async (req, res) => {
         // Parse JSON response from Claude
         let parsedReply;
         try {
-            // Claude may occasionally wrap the JSON in a code block despite instructions
-            const cleanText = replyText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
-            parsedReply = JSON.parse(cleanText);
+            // Find JSON block from first { to last }
+            const jsonMatch = replyText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                parsedReply = JSON.parse(jsonMatch[0]);
+            } else {
+                throw new Error("No JSON object found");
+            }
         } catch (parseError) {
-            console.error('Claude did not return valid JSON. Raw response:', replyText);
-            // Graceful fallback: wrap the raw text in the expected structure
+            console.error('Claude did not return valid JSON. Error:', parseError.message);
+            // Graceful fallback
             parsedReply = {
-                answer: replyText,
+                answer: replyText.replace(/```json[\s\S]*```/g, ''), // Strip code blocks just in case
                 intent: 'otro',
                 topic: 'desconocido',
-                suggested_next_questions: [
-                    '¿Cómo pago mis tasas municipales?',
-                    '¿Cómo renuevo mi licencia de conducir?',
-                    '¿Cómo habilito mi comercio?'
-                ],
-                handoff: {
-                    needed: false,
-                    reason: '',
-                    recommended_area: ''
-                }
+                suggested_next_questions: [],
+                handoff: { needed: false, reason: '', recommended_area: '' }
             };
         }
 
@@ -85,8 +81,26 @@ export const chatController = async (req, res) => {
             parsedReply.extracted_complaint_data.direccion) {
             
             try {
+                // Determine 'motivo' via secondary AI call
+                let classifiedMotivo = parsedReply.extracted_complaint_data.motivo || 'Sin categorizar';
+                try {
+                    const existingMotivos = getExistingMotivos();
+                    if (existingMotivos.length > 0) {
+                        const catResponse = await anthropic.messages.create({
+                            model: 'claude-3-haiku-20240307',
+                            max_tokens: 50,
+                            system: `Sos un categorizador objetivo. Clasificá el siguiente problema en UNO de los siguientes motivos existentes: ${existingMotivos.join(', ')}. Si el problema no encaja en ninguno de esos, inventá un motivo nuevo muy corto (max 3 palabras, primera letra mayúscula). Respondé ÚNICAMENTE con el nombre del motivo, sin punteos ni explicaciones.`,
+                            messages: [{ role: 'user', content: `Descripción del problema: ${parsedReply.extracted_complaint_data.descripcion}` }]
+                        });
+                        classifiedMotivo = catResponse.content[0].text.trim();
+                    }
+                } catch(e) {
+                    console.error('Error in AI motif classification:', e.message);
+                }
+
                 const complaintData = {
                     ...parsedReply.extracted_complaint_data,
+                    motivo: classifiedMotivo,
                     telefono: session_id // asumiendo que session_id es el teléfono de whatsapp
                 };
                 

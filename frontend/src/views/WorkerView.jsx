@@ -143,7 +143,7 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
 
       {resolveTarget && (
         <ResolveDialog
-          reclamoId={resolveTarget}
+          reclamo={reclamos.find(r => r.id === resolveTarget)}
           onConfirm={handleResolveConfirm}
           onCancel={() => setResolveTarget(null)}
         />

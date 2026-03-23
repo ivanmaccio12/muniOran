@@ -230,6 +230,10 @@ export const getReclamoById = (id) => {
 };
 
 // Update reclamo fields
+export const getExistingMotivos = () => {
+  return db.prepare('SELECT DISTINCT motivo FROM reclamos WHERE motivo IS NOT NULL AND motivo != "Sin categorizar"').all().map(r => r.motivo);
+};
+
 export const updateReclamo = (id, fields) => {
   const allowed = ['estado', 'equipo', 'asignado_a', 'motivo', 'solicita_update'];
   const updates = [];

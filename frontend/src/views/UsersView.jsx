@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useUsers } from '../hooks/useUsers.js';
 import './UsersView.css';
 
@@ -14,6 +14,7 @@ const UsersView = () => {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,6 +39,42 @@ const UsersView = () => {
     }
   };
 
+  const resetPassword = async (user) => {
+    const newPassword = prompt(`Ingresá la nueva contraseña para ${user.nombre} (mínimo 8 caracteres):`);
+    if (!newPassword) return;
+    if (newPassword.length < 8) {
+      alert('La contraseña debe tener al menos 8 caracteres.');
+      return;
+    }
+    try {
+      await updateUser(user.id, { password: newPassword });
+      alert('Contraseña actualizada correctamente.');
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const filteredUsers = useMemo(() => {
+    if (!users) return [];
+    const term = search.toLowerCase();
+    return users.filter(u => 
+      u.nombre.toLowerCase().includes(term) || 
+      u.email.toLowerCase().includes(term) ||
+      (u.equipo && u.equipo.toLowerCase().includes(term))
+    );
+  }, [users, search]);
+
+  const groupedUsers = useMemo(() => {
+    const groups = { 'Administración y Gestión': [] };
+    EQUIPOS.forEach(e => groups[e] = []);
+    filteredUsers.forEach(u => {
+      const key = u.equipo || 'Administración y Gestión';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(u);
+    });
+    return groups;
+  }, [filteredUsers]);
+
   if (loading) return <div className="users-loading">Cargando usuarios...</div>;
 
   return (
@@ -47,6 +84,16 @@ const UsersView = () => {
         <button className="btn-new-user" onClick={() => { setShowForm(!showForm); setError(''); setForm(emptyForm); }}>
           {showForm ? 'Cancelar' : '+ Nuevo Usuario'}
         </button>
+      </div>
+
+      <div className="users-controls">
+        <input 
+          type="text" 
+          className="users-search-input" 
+          placeholder="Buscar por nombre, email o equipo..." 
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
       {showForm && (
@@ -90,39 +137,54 @@ const UsersView = () => {
         </form>
       )}
 
-      <div className="users-table-wrap">
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Email</th>
-              <th>Rol</th>
-              <th>Equipo</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(u => (
-              <tr key={u.id} className={!u.activo ? 'row-inactive' : ''}>
-                <td>{u.nombre}</td>
-                <td className="td-email">{u.email}</td>
-                <td><span className={`rol-badge rol-${u.rol}`}>{ROL_LABEL[u.rol] || u.rol}</span></td>
-                <td>{u.equipo || '—'}</td>
-                <td>
-                  <span className={`status-badge ${u.activo ? 'status-active' : 'status-inactive'}`}>
-                    {u.activo ? 'Activo' : 'Inactivo'}
-                  </span>
-                </td>
-                <td>
-                  <button className={`btn-toggle ${u.activo ? 'btn-deactivate' : 'btn-activate'}`} onClick={() => toggleActivo(u)}>
-                    {u.activo ? 'Desactivar' : 'Activar'}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="users-groups-container">
+        {Object.entries(groupedUsers).map(([grupo, list]) => {
+          if (list.length === 0) return null;
+          return (
+            <div key={grupo} className="users-group">
+              <h3 className="users-group-title">
+                {grupo === 'Administración y Gestión' ? '🏢' : '👷'} {grupo} <span className="group-count">{list.length}</span>
+              </h3>
+              <div className="users-table-wrap">
+                <table className="users-table">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Email</th>
+                      <th>Rol</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {list.map(u => (
+                      <tr key={u.id} className={!u.activo ? 'row-inactive' : ''}>
+                        <td>{u.nombre}</td>
+                        <td className="td-email">{u.email}</td>
+                        <td><span className={`rol-badge rol-${u.rol}`}>{ROL_LABEL[u.rol] || u.rol}</span></td>
+                        <td>
+                          <span className={`status-badge ${u.activo ? 'status-active' : 'status-inactive'}`}>
+                            {u.activo ? 'Activo' : 'Inactivo'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="user-action-buttons">
+                            <button className={`btn-toggle ${u.activo ? 'btn-deactivate' : 'btn-activate'}`} onClick={() => toggleActivo(u)}>
+                              {u.activo ? 'Desactivar' : 'Activar'}
+                            </button>
+                            <button className="btn-reset-pwd" onClick={() => resetPassword(u)}>
+                              🔑 Reset
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
