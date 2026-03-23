@@ -1,21 +1,29 @@
 import { useState, useMemo } from 'react';
-import { COLUMNS_WORKER, MOCK_WORKERS } from '../data/mockReclamos';
+import { COLUMNS_WORKER } from '../data/mockReclamos';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useUsers } from '../hooks/useUsers.js';
 import KanbanColumn from '../components/KanbanColumn';
 import ReclamoDetail from '../components/ReclamoDetail';
+import ResolveDialog from '../components/ResolveDialog.jsx';
 import FilterBar from '../components/FilterBar';
 import './WorkerView.css';
 
-const WorkerView = ({ reclamos, moveEstado, updateMotivo, getNextEstado, getPrevEstado, addComentario, fetchReclamo }) => {
-  const [selectedWorker, setSelectedWorker] = useState(MOCK_WORKERS[0].id);
+const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNextEstado, getPrevEstado, addComentario, fetchReclamo }) => {
+  const { user } = useAuth();
+  const { workers, getWorkerName } = useUsers();
+
+  // equipo role: always their own reclamos; admin/gestor: can select any worker
+  const [selectedWorker, setSelectedWorker] = useState(null);
+  const effectiveWorker = user?.rol === 'equipo' ? user.id : (selectedWorker || user?.id);
+
   const [selectedReclamo, setSelectedReclamo] = useState(null);
+  const [resolveTarget, setResolveTarget] = useState(null);
   const [draggedId, setDraggedId] = useState(null);
   const [filters, setFilters] = useState({ search: '', motivo: '', estado: '' });
 
-  const worker = MOCK_WORKERS.find(w => w.id === selectedWorker);
-
   const myReclamos = useMemo(() => {
     return reclamos.filter(r => {
-      if (r.asignado_a !== selectedWorker) return false;
+      if (r.asignado_a !== effectiveWorker) return false;
       const term = (filters.search || '').toLowerCase();
       if (term && !(
         r.id.toLowerCase().includes(term) ||
@@ -28,7 +36,7 @@ const WorkerView = ({ reclamos, moveEstado, updateMotivo, getNextEstado, getPrev
       if (filters.estado && r.estado !== filters.estado) return false;
       return true;
     });
-  }, [reclamos, selectedWorker, filters]);
+  }, [reclamos, effectiveWorker, filters]);
 
   const reclamosByEstado = useMemo(() => {
     const grouped = {};
@@ -44,16 +52,29 @@ const WorkerView = ({ reclamos, moveEstado, updateMotivo, getNextEstado, getPrev
   }, [myReclamos]);
 
   const handleDragStart = (e, id) => { setDraggedId(id); e.dataTransfer.effectAllowed = 'move'; };
-  const handleDrop = (e, newEstado) => { if (draggedId) { moveEstado(draggedId, newEstado); setDraggedId(null); } };
+  const handleDrop = (_e, newEstado) => { if (draggedId) { moveEstado(draggedId, newEstado); setDraggedId(null); } };
 
-  const handleMoveNext = (id) => { const r = reclamos.find(x => x.id === id); const next = getNextEstado(r.estado); if (next && next !== 'descartado') moveEstado(id, next); };
+  const handleMoveNext = (id) => {
+    const r = reclamos.find(x => x.id === id);
+    const next = getNextEstado(r.estado);
+    if (!next || next === 'descartado') return;
+    if (next === 'resuelto') { setResolveTarget(id); return; }
+    moveEstado(id, next);
+  };
   const handleMovePrev = (id) => { const r = reclamos.find(x => x.id === id); const prev = getPrevEstado(r.estado); if (prev) moveEstado(id, prev); };
 
   const handleUpdateEstado = async (id, estado) => {
     if (estado === 'descartado') return;
+    if (estado === 'resuelto') { setResolveTarget(id); return; }
     await moveEstado(id, estado);
     const full = await fetchReclamo(id);
     setSelectedReclamo(full);
+  };
+
+  const handleResolveConfirm = async (id, comentario) => {
+    await resolveReclamo(id, comentario);
+    setResolveTarget(null);
+    setSelectedReclamo(null);
   };
 
   const handleUpdateMotivo = async (id, motivo) => {
@@ -72,12 +93,18 @@ const WorkerView = ({ reclamos, moveEstado, updateMotivo, getNextEstado, getPrev
     <div className="worker-view">
       <div className="worker-header">
         <div className="worker-selector">
-          <label>👤 Sesión como:</label>
-          <select value={selectedWorker} onChange={(e) => setSelectedWorker(e.target.value)}>
-            {MOCK_WORKERS.map(w => (
-              <option key={w.id} value={w.id}>{w.name} — {w.equipo}</option>
-            ))}
-          </select>
+          {user?.rol === 'equipo' ? (
+            <span className="worker-label">👤 {user.nombre} — {user.equipo}</span>
+          ) : (
+            <>
+              <label>👤 Ver reclamos de:</label>
+              <select value={selectedWorker || user?.id || ''} onChange={(e) => setSelectedWorker(e.target.value)}>
+                {workers.map(w => (
+                  <option key={w.id} value={w.id}>{w.nombre} — {w.equipo}</option>
+                ))}
+              </select>
+            </>
+          )}
         </div>
         <div className="worker-info">
           <span className="worker-count">{myReclamos.length} reclamos asignados</span>
@@ -98,6 +125,7 @@ const WorkerView = ({ reclamos, moveEstado, updateMotivo, getNextEstado, getPrev
             onMoveNext={handleMoveNext}
             onMovePrev={handleMovePrev}
             showArrows={true}
+            getWorkerName={getWorkerName}
           />
         ))}
       </div>
@@ -109,7 +137,15 @@ const WorkerView = ({ reclamos, moveEstado, updateMotivo, getNextEstado, getPrev
           onUpdateEstado={handleUpdateEstado}
           onUpdateMotivo={handleUpdateMotivo}
           onAddComentario={handleAddComentario}
-          currentWorker={selectedWorker}
+          currentWorker={effectiveWorker}
+        />
+      )}
+
+      {resolveTarget && (
+        <ResolveDialog
+          reclamoId={resolveTarget}
+          onConfirm={handleResolveConfirm}
+          onCancel={() => setResolveTarget(null)}
         />
       )}
     </div>

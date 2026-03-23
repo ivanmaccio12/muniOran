@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
 import OpenAI from 'openai';
+import bcrypt from 'bcryptjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '..', '..', 'data', 'munioran.db');
@@ -50,7 +51,47 @@ db.exec(`
     history TEXT NOT NULL,
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    rol TEXT NOT NULL DEFAULT 'equipo',
+    equipo TEXT,
+    activo INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS knowledge_documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    url TEXT NOT NULL UNIQUE,
+    content TEXT NOT NULL,
+    scraped_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
+
+// ============= SEED USERS =============
+const userCount = db.prepare('SELECT COUNT(*) as c FROM users').get();
+if (userCount.c === 0) {
+  console.log('🌱 Seeding users...');
+  const insertUser = db.prepare(`
+    INSERT INTO users (id, nombre, email, password_hash, rol, equipo, activo)
+    VALUES (@id, @nombre, @email, @password_hash, @rol, @equipo, @activo)
+  `);
+  const seedUsers = db.transaction(() => {
+    insertUser.run({ id: 'u-admin', nombre: 'Administrador', email: 'admin@munioran.gob.ar', password_hash: bcrypt.hashSync('admin1234', 10), rol: 'admin', equipo: null, activo: 1 });
+    insertUser.run({ id: 'w1', nombre: 'Juan Pérez', email: 'juan.perez@munioran.gob.ar', password_hash: bcrypt.hashSync('password123', 10), rol: 'equipo', equipo: 'Obras Públicas', activo: 1 });
+    insertUser.run({ id: 'w2', nombre: 'Laura Gómez', email: 'laura.gomez@munioran.gob.ar', password_hash: bcrypt.hashSync('password123', 10), rol: 'equipo', equipo: 'Alumbrado', activo: 1 });
+    insertUser.run({ id: 'w3', nombre: 'Martín López', email: 'martin.lopez@munioran.gob.ar', password_hash: bcrypt.hashSync('password123', 10), rol: 'equipo', equipo: 'GIRSU (Residuos)', activo: 1 });
+    insertUser.run({ id: 'w4', nombre: 'Carolina Ruiz', email: 'carolina.ruiz@munioran.gob.ar', password_hash: bcrypt.hashSync('password123', 10), rol: 'equipo', equipo: 'Bienestar Animal', activo: 1 });
+    insertUser.run({ id: 'w5', nombre: 'Pedro Sánchez', email: 'pedro.sanchez@munioran.gob.ar', password_hash: bcrypt.hashSync('password123', 10), rol: 'equipo', equipo: 'Tránsito', activo: 1 });
+    insertUser.run({ id: 'g1', nombre: 'Gestor Municipal', email: 'gestor@munioran.gob.ar', password_hash: bcrypt.hashSync('gestor1234', 10), rol: 'gestor', equipo: null, activo: 1 });
+  });
+  seedUsers();
+  console.log('✅ Seeded 7 users.');
+}
 
 // ============= SEED DATA =============
 const count = db.prepare('SELECT COUNT(*) as c FROM reclamos').get();
@@ -265,6 +306,59 @@ function formatReclamo(row) {
   };
 }
 
+// ============= USER QUERIES =============
+
+const stripHash = (u) => {
+  const { password_hash, ...rest } = u;
+  return rest;
+};
+
+export const getUserByEmail = (email) => {
+  return db.prepare('SELECT * FROM users WHERE email = ? AND activo = 1').get(email);
+};
+
+export const getUserById = (id) => {
+  const u = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+  return u ? stripHash(u) : null;
+};
+
+export const getAllUsers = () => {
+  return db.prepare('SELECT id, nombre, email, rol, equipo, activo, created_at FROM users ORDER BY created_at ASC').all();
+};
+
+export const createUser = (data) => {
+  const id = `u-${Date.now()}`;
+  db.prepare(`
+    INSERT INTO users (id, nombre, email, password_hash, rol, equipo, activo)
+    VALUES (@id, @nombre, @email, @password_hash, @rol, @equipo, @activo)
+  `).run({ id, nombre: data.nombre, email: data.email, password_hash: data.password_hash, rol: data.rol || 'equipo', equipo: data.equipo || null, activo: 1 });
+  return getUserById(id);
+};
+
+export const updateUser = (id, fields) => {
+  const allowed = ['nombre', 'email', 'rol', 'equipo', 'activo'];
+  const updates = [];
+  const values = {};
+  for (const key of allowed) {
+    if (fields[key] !== undefined) {
+      updates.push(`${key} = @${key}`);
+      values[key] = fields[key];
+    }
+  }
+  if (fields.password_hash !== undefined) {
+    updates.push('password_hash = @password_hash');
+    values.password_hash = fields.password_hash;
+  }
+  if (updates.length === 0) return getUserById(id);
+  values.id = id;
+  db.prepare(`UPDATE users SET ${updates.join(', ')} WHERE id = @id`).run(values);
+  return getUserById(id);
+};
+
+export const getCommentCountForReclamo = (reclamoId) => {
+  return db.prepare('SELECT COUNT(*) as c FROM comentarios WHERE reclamo_id = ?').get(reclamoId).c;
+};
+
 // ============= RAG: VECTOR SEARCH =============
 
 const pgPool = process.env.DATABASE_URL
@@ -279,25 +373,41 @@ const openai = process.env.OPENAI_API_KEY
   : null;
 
 export const searchKnowledge = async (queryText) => {
-  if (!openai || !pgPool) return [];
+  // 1. Try PostgreSQL vector search (requires OPENAI_API_KEY + DATABASE_URL)
+  if (openai && pgPool) {
+    try {
+      const embedRes = await openai.embeddings.create({
+        model: 'text-embedding-3-small',
+        input: queryText,
+        encoding_format: 'float',
+      });
+      const embedding = embedRes.data[0].embedding;
+      const result = await pgPool.query(`
+        SELECT title, url, content
+        FROM knowledge_documents
+        ORDER BY embedding <=> $1::vector
+        LIMIT 4
+      `, [JSON.stringify(embedding)]);
+      if (result.rows.length > 0) return result.rows;
+    } catch (e) {
+      console.error('Vector Search Error:', e.message);
+    }
+  }
+
+  // 2. Fallback: SQLite keyword search in knowledge_documents
   try {
-    const embedRes = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: queryText,
-      encoding_format: 'float',
-    });
-    const embedding = embedRes.data[0].embedding;
-
-    const result = await pgPool.query(`
-      SELECT title, url, content
+    const words = queryText.split(/\s+/).filter(w => w.length > 3).slice(0, 5);
+    if (words.length === 0) return [];
+    const conditions = words.map(() => "(title LIKE ? OR content LIKE ?)").join(' OR ');
+    const params = words.flatMap(w => [`%${w}%`, `%${w}%`]);
+    const rows = db.prepare(`
+      SELECT title, url, SUBSTR(content, 1, 600) as content
       FROM knowledge_documents
-      ORDER BY embedding <=> $1::vector
-      LIMIT 4
-    `, [JSON.stringify(embedding)]);
-
-    return result.rows;
+      WHERE ${conditions}
+      LIMIT 3
+    `).all(...params);
+    return rows;
   } catch (e) {
-    console.error('Vector Search Error:', e.message);
     return [];
   }
 };

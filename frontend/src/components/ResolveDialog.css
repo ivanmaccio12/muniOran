@@ -1,0 +1,61 @@
+.resolve-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+
+.resolve-dialog {
+  background: var(--bg-secondary, #fff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 12px; padding: 1.75rem;
+  width: 100%; max-width: 480px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+.resolve-dialog h3 {
+  margin: 0 0 0.5rem; font-size: 1.1rem;
+  color: var(--text-primary, #1a1a2e);
+}
+
+.resolve-hint {
+  margin: 0 0 1rem; font-size: 0.88rem;
+  color: var(--text-secondary, #666); line-height: 1.5;
+}
+
+.resolve-textarea {
+  width: 100%; padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border-color, #ddd); border-radius: 8px;
+  font-size: 0.92rem; font-family: inherit;
+  background: var(--bg-primary, #f9f9f9); color: var(--text-primary, #1a1a2e);
+  resize: vertical; box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.resolve-textarea:focus { outline: none; border-color: #27ae60; }
+
+.resolve-error {
+  margin-top: 0.5rem; padding: 0.5rem 0.75rem;
+  background: #fdecea; color: #c0392b;
+  border-radius: 7px; font-size: 0.85rem;
+}
+
+.resolve-actions {
+  display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;
+}
+
+.resolve-btn-cancel {
+  padding: 0.55rem 1.2rem; border-radius: 8px;
+  border: 1px solid var(--border-color, #ddd);
+  background: transparent; color: var(--text-secondary, #666);
+  font-size: 0.9rem; cursor: pointer;
+}
+.resolve-btn-cancel:hover { background: var(--bg-primary, #f5f5f5); }
+
+.resolve-btn-confirm {
+  padding: 0.55rem 1.4rem; border-radius: 8px;
+  background: #27ae60; color: #fff; border: none;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+.resolve-btn-confirm:hover:not(:disabled) { background: #1e8449; }
+.resolve-btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }

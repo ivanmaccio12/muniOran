@@ -1,12 +1,16 @@
 import { useState, useMemo } from 'react';
 import { COLUMNS_ADMIN } from '../data/mockReclamos';
+import { useUsers } from '../hooks/useUsers.js';
 import KanbanColumn from '../components/KanbanColumn';
 import ReclamoDetail from '../components/ReclamoDetail';
+import ResolveDialog from '../components/ResolveDialog.jsx';
 import FilterBar from '../components/FilterBar';
 import './AdminView.css';
 
-const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardReclamo, getNextEstado, getPrevEstado, addComentario, fetchReclamo }) => {
+const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardReclamo, resolveReclamo, getNextEstado, getPrevEstado, addComentario, fetchReclamo }) => {
+  const { getWorkerName } = useUsers();
   const [selectedReclamo, setSelectedReclamo] = useState(null);
+  const [resolveTarget, setResolveTarget] = useState(null); // id of reclamo pending resolution
   const [draggedId, setDraggedId] = useState(null);
   const [filters, setFilters] = useState({ search: '', equipo: '', motivo: '', estado: '' });
 
@@ -72,7 +76,10 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
   const handleMoveNext = (id) => {
     const r = reclamos.find(x => x.id === id);
     const next = getNextEstado(r.estado);
-    if (next && checkCanMoveToAsignado(r, next)) moveEstado(id, next);
+    if (!next) return;
+    if (!checkCanMoveToAsignado(r, next)) return;
+    if (next === 'resuelto') { setResolveTarget(id); return; }
+    moveEstado(id, next);
   };
 
   const handleMovePrev = (id) => {
@@ -89,10 +96,16 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
   const handleUpdateEstado = async (id, estado) => {
     const r = reclamos.find(x => x.id === id);
     if (!checkCanMoveToAsignado(r, estado)) return;
-    
+    if (estado === 'resuelto') { setResolveTarget(id); return; }
     await moveEstado(id, estado);
     const full = await fetchReclamo(id);
     setSelectedReclamo(full);
+  };
+
+  const handleResolveConfirm = async (id, comentario) => {
+    await resolveReclamo(id, comentario);
+    setResolveTarget(null);
+    setSelectedReclamo(null);
   };
 
   const handleUpdateMotivo = async (id, motivo) => {
@@ -142,6 +155,7 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
               onMovePrev={!isFirst ? handleMovePrev : null}
               onDiscard={discardReclamo}
               showArrows={true}
+              getWorkerName={getWorkerName}
             />
           );
         })}
@@ -155,6 +169,14 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
           onUpdateMotivo={handleUpdateMotivo}
           onAssign={handleAssign}
           onAddComentario={handleAddComentario}
+        />
+      )}
+
+      {resolveTarget && (
+        <ResolveDialog
+          reclamoId={resolveTarget}
+          onConfirm={handleResolveConfirm}
+          onCancel={() => setResolveTarget(null)}
         />
       )}
     </div>

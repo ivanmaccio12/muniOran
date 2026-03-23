@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { COLUMNS_ADMIN, MOCK_WORKERS, EQUIPOS, MOTIVOS, MOTIVO_TO_EQUIPO } from '../data/mockReclamos';
+import { COLUMNS_ADMIN, EQUIPOS, MOTIVOS, MOTIVO_TO_EQUIPO } from '../data/mockReclamos';
+import { useUsers } from '../hooks/useUsers.js';
 import './ReclamoDetail.css';
 
 const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAssign, onAddComentario, onSolicitarUpdate, readOnly = false, currentWorker = null }) => {
   const [nuevoComentario, setNuevoComentario] = useState('');
+  const { workers, getWorkerName } = useUsers();
+  const workerName = reclamo.asignado_a ? getWorkerName(reclamo.asignado_a) : null;
 
   if (!reclamo) return null;
 
@@ -21,14 +24,12 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
     ? `https://www.google.com/maps?q=${reclamo.coordenadas}`
     : `https://www.google.com/maps/search/${encodeURIComponent(reclamo.direccion + ', Orán, Salta, Argentina')}`;
 
-  const shareUrl = `${window.location.origin}/consulta?id=${reclamo.id}`;
-  const worker = reclamo.asignado_a ? MOCK_WORKERS.find(w => w.id === reclamo.asignado_a) : null;
   const suggestedEquipo = MOTIVO_TO_EQUIPO[reclamo.motivo];
 
   const handleSubmitComment = () => {
     if (!nuevoComentario.trim()) return;
-    const author = currentWorker ? MOCK_WORKERS.find(w => w.id === currentWorker) : { name: 'Admin', equipo: 'Administración' };
-    onAddComentario(reclamo.id, author?.name || 'Admin', author?.equipo || 'Administración', nuevoComentario.trim());
+    const authorName = currentWorker ? (getWorkerName(currentWorker) || 'Staff') : 'Admin';
+    onAddComentario(reclamo.id, authorName, 'Administración', nuevoComentario.trim());
     setNuevoComentario('');
   };
 
@@ -92,15 +93,15 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
           </div>
           {reclamo.barrio && <div className="detail-field"><label>🏘️ Barrio</label><span>{reclamo.barrio}</span></div>}
           {reclamo.equipo && <div className="detail-field"><label>🏢 Equipo</label><span>{reclamo.equipo}</span></div>}
-          {worker && <div className="detail-field"><label>👤 Asignado a</label><span>{worker.name}</span></div>}
+          {workerName && <div className="detail-field"><label>👤 Asignado a</label><span>{workerName}</span></div>}
         </div>
 
         {/* Share */}
         <div className="detail-share">
-          <button className="share-link-btn" onClick={() => { navigator.clipboard.writeText(shareUrl); }}>
-            🔗 Copiar link de seguimiento
+          <button className="share-link-btn" onClick={() => { navigator.clipboard.writeText(reclamo.id); }}>
+            🔗 Copiar ID de reclamo
           </button>
-          <span className="share-url">{shareUrl}</span>
+          <span className="share-url">{reclamo.id}</span>
         </div>
 
         {/* ==================== COMMENTS SECTION ==================== */}
@@ -201,7 +202,7 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
                   <select className="motivo-select" value={reclamo.asignado_a || ''}
                     onChange={(e) => onAssign(reclamo.id, e.target.value, reclamo.equipo)}>
                     <option value="">Sin asignar</option>
-                    {MOCK_WORKERS.map(w => <option key={w.id} value={w.id}>{w.name} ({w.equipo})</option>)}
+                    {workers.map(w => <option key={w.id} value={w.id}>{w.nombre} ({w.equipo})</option>)}
                   </select>
                 </div>
                 {suggestedEquipo && reclamo.equipo !== suggestedEquipo && (

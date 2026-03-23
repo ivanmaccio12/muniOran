@@ -8,6 +8,9 @@ import {
   listReclamos, getReclamo, patchReclamo,
   listComentarios, postComentario, solicitarUpdate, postReclamo,
 } from './controllers/reclamosController.js';
+import { postLogin, getMe } from './controllers/authController.js';
+import { listUsers, postUser, patchUser } from './controllers/usersController.js';
+import { requireAuth, requireRole } from './middleware/authMiddleware.js';
 
 dotenv.config();
 
@@ -25,14 +28,23 @@ app.get('/health', (req, res) => {
 // Chatbot endpoint (existing)
 app.post('/chat', chatController);
 
+// ============= AUTH API =============
+app.post('/api/auth/login', postLogin);
+app.get('/api/auth/me', requireAuth, getMe);
+
+// ============= USERS API (admin only) =============
+app.get('/api/users', requireAuth, requireRole('admin', 'gestor'), listUsers);
+app.post('/api/users', requireAuth, requireRole('admin'), postUser);
+app.patch('/api/users/:id', requireAuth, requireRole('admin'), patchUser);
+
 // ============= RECLAMOS API =============
-app.get('/api/reclamos', listReclamos);
-app.post('/api/reclamos', postReclamo);
-app.get('/api/reclamos/:id', getReclamo);
-app.patch('/api/reclamos/:id', patchReclamo);
-app.get('/api/reclamos/:id/comentarios', listComentarios);
-app.post('/api/reclamos/:id/comentarios', postComentario);
-app.post('/api/reclamos/:id/solicitar-update', solicitarUpdate);
+app.get('/api/reclamos', requireAuth, listReclamos);
+app.post('/api/reclamos', requireAuth, postReclamo);
+app.get('/api/reclamos/:id', requireAuth, getReclamo);
+app.patch('/api/reclamos/:id', requireAuth, patchReclamo);
+app.get('/api/reclamos/:id/comentarios', requireAuth, listComentarios);
+app.post('/api/reclamos/:id/comentarios', requireAuth, postComentario);
+app.post('/api/reclamos/:id/solicitar-update', requireAuth, solicitarUpdate);
 
 // ============= FRONTEND KANBAN =============
 const __filename = fileURLToPath(import.meta.url);

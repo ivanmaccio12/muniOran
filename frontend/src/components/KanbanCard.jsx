@@ -1,7 +1,6 @@
-import { MOCK_WORKERS } from '../data/mockReclamos';
 import './KanbanCard.css';
 
-const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onDiscard, showArrows = true, readOnly = false }) => {
+const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onDiscard, showArrows = true, readOnly = false, getWorkerName = () => null }) => {
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -23,17 +22,15 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
     ? `https://www.google.com/maps?q=${reclamo.coordenadas}`
     : `https://www.google.com/maps/search/${encodeURIComponent(reclamo.direccion + ', Orán, Salta, Argentina')}`;
 
-  const shareUrl = `${window.location.origin}/consulta?id=${reclamo.id}`;
-
   const handleShare = (e) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(shareUrl);
+    navigator.clipboard.writeText(reclamo.id);
     const btn = e.currentTarget;
     btn.classList.add('copied');
     setTimeout(() => btn.classList.remove('copied'), 1500);
   };
 
-  const worker = reclamo.asignado_a ? MOCK_WORKERS.find(w => w.id === reclamo.asignado_a) : null;
+  const workerName = reclamo.asignado_a ? getWorkerName(reclamo.asignado_a) : null;
 
   const commentCount = reclamo.comentarios?.length || 0;
 
@@ -78,9 +75,9 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
       </div>
 
       {/* Assignment */}
-      {(worker || reclamo.equipo) && (
+      {(workerName || reclamo.equipo) && (
         <div className="card-assigned">
-          {worker && <span className="assigned-worker">👤 {worker.name}</span>}
+          {workerName && <span className="assigned-worker">👤 {workerName}</span>}
           {reclamo.equipo && <span className="assigned-equipo">🏢 {reclamo.equipo}</span>}
         </div>
       )}

@@ -2,6 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 
 const API_BASE = import.meta.env.DEV ? 'http://localhost:3003/api' : '/api';
 
+const authHeaders = () => {
+  const token = localStorage.getItem('muni-token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
 // Equipos/Áreas de la Municipalidad
 export const EQUIPOS = [
   'Obras Públicas',
@@ -65,7 +73,8 @@ export const useReclamos = () => {
   // Fetch all reclamos
   const fetchReclamos = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/reclamos`);
+      const res = await fetch(`${API_BASE}/reclamos`, { headers: authHeaders() });
+      if (!res.ok) { setLoading(false); return; }
       const data = await res.json();
       setReclamos(data);
     } catch (err) {
@@ -80,7 +89,7 @@ export const useReclamos = () => {
   // Fetch single reclamo with comments
   const fetchReclamo = async (id) => {
     try {
-      const res = await fetch(`${API_BASE}/reclamos/${id}`);
+      const res = await fetch(`${API_BASE}/reclamos/${id}`, { headers: authHeaders() });
       return await res.json();
     } catch (err) {
       console.error('Error fetching reclamo:', err);
@@ -88,18 +97,19 @@ export const useReclamos = () => {
     }
   };
 
-  // PATCH reclamo and refresh list
+  // PATCH reclamo and refresh list — returns response for error handling
   const patchAndRefresh = async (id, body) => {
-    try {
-      await fetch(`${API_BASE}/reclamos/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      await fetchReclamos();
-    } catch (err) {
-      console.error('Error updating reclamo:', err);
+    const res = await fetch(`${API_BASE}/reclamos/${id}`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify(body),
+    });
+    await fetchReclamos();
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al actualizar reclamo');
     }
+    return res.json();
   };
 
   const moveEstado = (id, nuevoEstado) => patchAndRefresh(id, { estado: nuevoEstado });
@@ -114,7 +124,7 @@ export const useReclamos = () => {
     try {
       await fetch(`${API_BASE}/reclamos/${id}/comentarios`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify({ autor, rol, texto }),
       });
       await fetchReclamos();
@@ -123,9 +133,16 @@ export const useReclamos = () => {
     }
   };
 
+  // Resolve reclamo — requires a comentario (enforced by backend too)
+  const resolveReclamo = (id, comentario_resolucion) =>
+    patchAndRefresh(id, { estado: 'resuelto', comentario_resolucion });
+
   const solicitarUpdate = async (id) => {
     try {
-      await fetch(`${API_BASE}/reclamos/${id}/solicitar-update`, { method: 'POST' });
+      await fetch(`${API_BASE}/reclamos/${id}/solicitar-update`, {
+        method: 'POST',
+        headers: authHeaders(),
+      });
       await fetchReclamos();
     } catch (err) {
       console.error('Error requesting update:', err);
@@ -154,6 +171,7 @@ export const useReclamos = () => {
     updateMotivo,
     discardReclamo,
     addComentario,
+    resolveReclamo,
     solicitarUpdate,
     getNextEstado,
     getPrevEstado,

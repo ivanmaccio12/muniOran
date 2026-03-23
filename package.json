@@ -13,12 +13,16 @@
     "license": "ISC",
     "dependencies": {
         "@anthropic-ai/sdk": "^0.36.3",
+        "bcryptjs": "^3.0.3",
         "better-sqlite3": "^12.8.0",
         "cors": "^2.8.5",
         "csv-parser": "^3.2.0",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
+        "jsonwebtoken": "^9.0.3",
+        "nodemailer": "^8.0.3",
         "openai": "^6.25.0",
+        "pdf-parse": "^2.4.5",
         "pg": "^8.13.3"
     }
 }

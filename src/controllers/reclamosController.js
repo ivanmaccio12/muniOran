@@ -1,5 +1,6 @@
-import { getAllReclamos, getReclamoById, updateReclamo, addComentario, getComentarios, createReclamo } from '../services/db.js';
+import { getAllReclamos, getReclamoById, updateReclamo, addComentario, getComentarios, createReclamo, getUserById, getCommentCountForReclamo } from '../services/db.js';
 import { sendWhatsApp } from '../services/whatsappService.js';
+import { sendAssignmentEmail } from '../services/emailService.js';
 
 // GET /api/reclamos
 export const listReclamos = (req, res) => {
@@ -25,17 +26,54 @@ export const getReclamo = (req, res) => {
 };
 
 // PATCH /api/reclamos/:id
-export const patchReclamo = (req, res) => {
+export const patchReclamo = async (req, res) => {
   try {
-    const updated = updateReclamo(req.params.id, req.body);
+    const { id } = req.params;
+    const { comentario_resolucion, ...fields } = req.body;
+
+    // Validación: pasar a resuelto requiere comentario
+    if (fields.estado === 'resuelto') {
+      const existingComments = getCommentCountForReclamo(id);
+      if (!comentario_resolucion && existingComments === 0) {
+        return res.status(400).json({ error: 'Se requiere un comentario de resolución para marcar como resuelto' });
+      }
+    }
+
+    // Auto-guardar comentario de resolución antes de cambiar estado
+    if (comentario_resolucion) {
+      const autor = req.user?.nombre || 'Sistema';
+      const rol = req.user?.equipo || req.user?.rol || 'Administración';
+      addComentario(id, autor, rol, comentario_resolucion);
+    }
+
+    // Auto-asignar estado a 'asignado' si se asigna equipo + persona desde 'nuevo'
+    const current = getReclamoById(id);
+    if (!current) return res.status(404).json({ error: 'Reclamo no encontrado' });
+
+    const willHaveEquipo = fields.equipo !== undefined ? fields.equipo : current.equipo;
+    const willHaveAsignado = fields.asignado_a !== undefined ? fields.asignado_a : current.asignado_a;
+    if (willHaveEquipo && willHaveAsignado && current.estado === 'nuevo' && !fields.estado) {
+      fields.estado = 'asignado';
+    }
+
+    const updated = updateReclamo(id, fields);
     if (!updated) return res.status(404).json({ error: 'Reclamo no encontrado o sin cambios' });
-    
-    // Notificación WhatsApp al vecino según el nuevo estado
-    if (req.body.estado === 'resuelto' || req.body.estado === 'descartado') {
-      const comentariosTexto = updated.comentarios && updated.comentarios.length > 0
-        ? updated.comentarios.map(c => `  - [${c.autor}] ${c.texto}`).join('\n')
+
+    // Email al trabajador cuando se le asigna el reclamo
+    const prevAsignado = current.asignado_a;
+    const newAsignado = updated.asignado_a;
+    if (newAsignado && newAsignado !== prevAsignado) {
+      const worker = getUserById(newAsignado);
+      if (worker) sendAssignmentEmail(worker, updated).catch(() => {});
+    }
+
+    // WhatsApp al vecino cuando se resuelve o descarta
+    if (fields.estado === 'resuelto' || fields.estado === 'descartado') {
+      const refetch = getReclamoById(id);
+      const comentariosTexto = refetch.comentarios?.length > 0
+        ? refetch.comentarios.map(c => `  - [${c.autor}] ${c.texto}`).join('\n')
         : '  (sin comentarios)';
-      const estadoLabel = req.body.estado === 'resuelto' ? 'RESUELTO ✅' : 'DESCARTADO ❌';
+      const estadoLabel = fields.estado === 'resuelto' ? 'RESUELTO ✅' : 'DESCARTADO ❌';
       const mensaje = [
         `🏛️ *Municipalidad de Orán — Actualización de Reclamo*`,
         ``,
@@ -50,14 +88,12 @@ export const patchReclamo = (req, res) => {
         `💬 *Comentarios del equipo*`,
         comentariosTexto,
         ``,
-        `Gracias por usar El Municipal.`,
+        `Gracias por comunicarte con El Municipal.`,
       ].join('\n');
       sendWhatsApp(updated.telefono, mensaje);
-    } else {
-      console.log(`📲 [WhatsApp] → ${updated.telefono}: Tu reclamo ${updated.id} fue actualizado.`);
     }
-    
-    res.json(updated);
+
+    res.json(getReclamoById(id));
   } catch (err) {
     console.error('Error updating reclamo:', err);
     res.status(500).json({ error: 'Error al actualizar reclamo' });
@@ -77,9 +113,11 @@ export const listComentarios = (req, res) => {
 // POST /api/reclamos/:id/comentarios
 export const postComentario = (req, res) => {
   try {
-    const { autor, rol, texto } = req.body;
-    if (!autor || !texto) return res.status(400).json({ error: 'Faltan campos: autor, texto' });
-    const comment = addComentario(req.params.id, autor, rol || 'Administración', texto);
+    const { texto } = req.body;
+    const autor = req.body.autor || req.user?.nombre || 'Sistema';
+    const rol = req.body.rol || req.user?.equipo || req.user?.rol || 'Administración';
+    if (!texto) return res.status(400).json({ error: 'Falta el campo: texto' });
+    const comment = addComentario(req.params.id, autor, rol, texto);
     // Log WhatsApp notification
     const reclamo = getReclamoById(req.params.id);
     if (reclamo) {
