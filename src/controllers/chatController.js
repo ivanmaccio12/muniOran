@@ -209,8 +209,8 @@ export const chatController = async (req, res) => {
         }
 
         // Si vino media_url pero NO se creó un reclamo nuevo, intentar adjuntarla al reclamo activo
-        // (ya quedó guardada en el buffer, se usará cuando el reclamo se cree)
-        if (media_url && !parsedReply.extracted_complaint_data?.nombre_apellido) {
+        // SOLO si el usuario no está en medio de la creación de un nuevo reclamo (intent !== 'reclamo')
+        if (media_url && !parsedReply.extracted_complaint_data?.nombre_apellido && parsedReply.intent !== 'reclamo') {
             try {
                 const reclamoActivo = getActiveReclamoByTelefono(session_id);
                 if (reclamoActivo) {
