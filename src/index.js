@@ -47,11 +47,16 @@ app.get('/api/reclamos/:id/comentarios', requireAuth, listComentarios);
 app.post('/api/reclamos/:id/comentarios', requireAuth, postComentario);
 app.post('/api/reclamos/:id/solicitar-update', requireAuth, solicitarUpdate);
 
-// ============= FRONTEND KANBAN =============
+// ============= FRONTEND KANBAN & MEDIA =============
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicPath = path.join(__dirname, '..', 'public');
+const uploadsPath = path.join(__dirname, '..', 'data', 'uploads');
 
+import fs from 'fs';
+if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath, { recursive: true });
+
+app.use('/uploads', express.static(uploadsPath));
 app.use('/kanban', express.static(publicPath));
 // Fallback para React Router
 app.get('/kanban/*', (req, res) => {

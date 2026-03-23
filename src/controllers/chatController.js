@@ -15,10 +15,27 @@ const anthropic = new Anthropic({
 // key: session_id (teléfono), value: string[]
 const pendingMediaBySession = new Map();
 
+import fs from 'fs';
+import path from 'path';
+
 export const chatController = async (req, res) => {
     try {
-        const { session_id, channel, userId, media_url } = req.body;
-        let { message, context } = req.body;
+        const { session_id, channel, userId } = req.body;
+        let { message, context, media_url } = req.body;
+
+        // --- Manejo de imagen nativa (Base64) enviada desde n8n
+        if (req.body.media_base64) {
+            try {
+                const ext = req.body.media_mime ? req.body.media_mime.split('/')[1] : 'jpg';
+                const filename = `img_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+                const filepath = path.join(process.cwd(), 'data', 'uploads', filename);
+                if (!fs.existsSync(path.dirname(filepath))) fs.mkdirSync(path.dirname(filepath), { recursive: true });
+                fs.writeFileSync(filepath, req.body.media_base64, 'base64');
+                media_url = `http://31.97.31.53:3003/uploads/${filename}`;
+            } catch (err) {
+                console.error('Error guardando imagen base64:', err.message);
+            }
+        }
 
         // Si viene solo una foto sin texto, usamos un mensaje implícito para Claude
         if (!message && media_url) {
