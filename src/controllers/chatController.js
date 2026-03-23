@@ -1,7 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getSystemPrompt } from '../config/systemPrompt.js';
 import { getHistory, saveHistory } from '../services/conversationService.js';
-import { createReclamo, searchKnowledge, getReclamoById, getExistingMotivos } from '../services/db.js';
+import { createReclamo, updateReclamo, searchKnowledge, getReclamoById, getExistingMotivos, getDistinctEquipos, getUserWithLeastLoadInEquipo, addFotoToReclamo, getActiveReclamoByTelefono } from '../services/db.js';
+import { getLiveContext } from '../services/liveDataService.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -10,10 +11,26 @@ const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+// Buffer en memoria: guarda fotos recibidas antes de que el reclamo se cree
+// key: session_id (teléfono), value: string[]
+const pendingMediaBySession = new Map();
+
 export const chatController = async (req, res) => {
     try {
-        const { message, session_id, channel, userId } = req.body;
-        let { context } = req.body;
+        const { session_id, channel, userId, media_url } = req.body;
+        let { message, context } = req.body;
+
+        // Si viene solo una foto sin texto, usamos un mensaje implícito para Claude
+        if (!message && media_url) {
+            message = '[El vecino envió una foto como parte de su reclamo]';
+        }
+
+        // Acumular media_url pendiente en el buffer de la sesión
+        if (media_url) {
+            const existing = pendingMediaBySession.get(session_id) || [];
+            if (!existing.includes(media_url)) existing.push(media_url);
+            pendingMediaBySession.set(session_id, existing);
+        }
 
         if (!message) {
             return res.status(400).json({ error: 'El campo message es requerido.' });
@@ -31,6 +48,19 @@ export const chatController = async (req, res) => {
             context = (context ? context + '\n\n' : '') + addedContext;
         }
 
+        // Live data from oran.gob.ar API (cached 1h, keyword-triggered)
+        try {
+            const liveDocs = await getLiveContext(message);
+            if (liveDocs && liveDocs.length > 0) {
+                const liveContext = liveDocs.map(doc =>
+                    `📡 Dato en tiempo real — ${doc.title}\n🔗 Fuente: ${doc.url}\n📄 Contenido:\n${doc.content}`
+                ).join('\n\n');
+                context = (context ? context + '\n\n' : '') + liveContext;
+            }
+        } catch (e) {
+            console.error('[chatController] Live data error:', e.message);
+        }
+
         // Build system prompt (inject optional context if provided by n8n/RAG)
         const systemPrompt = getSystemPrompt();
         const contextBlock = context
@@ -40,8 +70,13 @@ export const chatController = async (req, res) => {
         // Load conversation history from PostgreSQL (expires after 24h automatically)
         const history = await getHistory(session_id);
 
+        // Si viene media_url, incluirla en el mensaje para que Claude lo considere
+        const effectiveMessage = media_url
+            ? `${message}\n[Adjunto de imagen recibido: ${media_url}]`
+            : message;
+
         // Build messages array: existing history + new user message
-        const messages = [...history, { role: 'user', content: message }];
+        const messages = [...history, { role: 'user', content: effectiveMessage }];
 
         const response = await anthropic.messages.create({
             model: 'claude-sonnet-4-5-20250929',
@@ -98,20 +133,78 @@ export const chatController = async (req, res) => {
                     console.error('Error in AI motif classification:', e.message);
                 }
 
+                // Auto-assign equipo based on motivo + descripcion
+                let autoEquipo = null;
+                try {
+                    const equipos = getDistinctEquipos();
+                    if (equipos.length > 0) {
+                        const eqResponse = await anthropic.messages.create({
+                            model: 'claude-3-haiku-20240307',
+                            max_tokens: 30,
+                            system: `Sos un clasificador. Asigná el siguiente reclamo al área más adecuada de esta lista: ${equipos.join(', ')}. Si ninguna encaja claramente, respondé exactamente "ninguna". Respondé ÚNICAMENTE con el nombre del área tal como aparece en la lista, sin explicaciones.`,
+                            messages: [{ role: 'user', content: `Motivo: ${classifiedMotivo}\nDescripción: ${parsedReply.extracted_complaint_data.descripcion}` }]
+                        });
+                        const suggested = eqResponse.content[0].text.trim();
+                        if (equipos.includes(suggested)) autoEquipo = suggested;
+                    }
+                } catch(e) {
+                    console.error('Error in equipo auto-assignment:', e.message);
+                }
+
                 const complaintData = {
                     ...parsedReply.extracted_complaint_data,
                     motivo: classifiedMotivo,
                     telefono: session_id // asumiendo que session_id es el teléfono de whatsapp
                 };
-                
+
                 const savedComplaint = createReclamo(complaintData);
                 console.log(`✅ Nuevo reclamo guardado en BD. ID: ${savedComplaint.id}`);
-                
+
+                if (autoEquipo) {
+                    const suggestedUserId = getUserWithLeastLoadInEquipo(autoEquipo);
+                    updateReclamo(savedComplaint.id, {
+                        suggested_equipo: autoEquipo,
+                        suggested_asignado: suggestedUserId || null,
+                    });
+                    console.log(`💡 Sugerencia para ${savedComplaint.id}: ${autoEquipo} → ${suggestedUserId}`);
+                }
+
+                // Si hay fotos pendientes en el buffer de esta sesión, adjuntarlas al reclamo
+                const pendingFotos = pendingMediaBySession.get(session_id) || [];
+                for (const fotoUrl of pendingFotos) {
+                    addFotoToReclamo(savedComplaint.id, fotoUrl);
+                }
+                // También adjuntar media_url del mensaje actual si no estaba ya
+                if (media_url && !pendingFotos.includes(media_url)) {
+                    addFotoToReclamo(savedComplaint.id, media_url);
+                }
+                if (pendingFotos.length > 0 || media_url) {
+                    console.log(`📷 ${pendingFotos.length} foto(s) adjuntadas al reclamo ${savedComplaint.id}`);
+                    pendingMediaBySession.delete(session_id); // limpiar buffer
+                }
+
                 // Le aseguramos al usuario final cuál es su número de reclamo.
                 parsedReply.answer += `\n\n✅ ¡Listo! Tu reclamo está registrado. El número de seguimiento es: *${savedComplaint.id}*.`;
             } catch (dbError) {
                 console.error('❌ Error al guardar el reclamo automáticamente:', dbError.message);
                 // Opcional: Podríamos alterar parsedReply.answer para avisar que hubo un problema temporal.
+            }
+        }
+
+        // Si vino media_url pero NO se creó un reclamo nuevo, intentar adjuntarla al reclamo activo
+        // (ya quedó guardada en el buffer, se usará cuando el reclamo se cree)
+        if (media_url && !parsedReply.extracted_complaint_data?.nombre_apellido) {
+            try {
+                const reclamoActivo = getActiveReclamoByTelefono(session_id);
+                if (reclamoActivo) {
+                    addFotoToReclamo(reclamoActivo.id, media_url);
+                    pendingMediaBySession.delete(session_id); // ya adjuntada, limpiar
+                    console.log(`📷 Foto adjuntada al reclamo activo ${reclamoActivo.id} del teléfono ${session_id}`);
+                } else {
+                    console.log(`📷 Foto de ${session_id} guardada en buffer, se adjuntará cuando se cree el reclamo.`);
+                }
+            } catch (e) {
+                console.error('Error adjuntando foto a reclamo activo:', e.message);
             }
         }
 
