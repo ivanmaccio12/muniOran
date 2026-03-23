@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext(null);
 
 const TOKEN_KEY = 'muni-token';
-const API = 'http://localhost:3003';
+const API = import.meta.env.DEV ? 'http://localhost:3003' : '';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
