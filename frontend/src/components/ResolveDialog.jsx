@@ -2,17 +2,14 @@ import { useState } from 'react';
 import './ResolveDialog.css';
 
 const ResolveDialog = ({ reclamo, onConfirm, onCancel }) => {
-  const defaultText = reclamo ? `¡Hola! Nos comunicamos desde la Municipalidad de Orán. Te informamos que tu reclamo por ${reclamo.motivo} en ${reclamo.direccion} ya fue resuelto. ¡Gracias por ayudarnos a mejorar la ciudad!` : '';
-  const [comentario, setComentario] = useState(defaultText);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const handleConfirm = async () => {
-    if (!comentario.trim()) return;
+  const handleConfirm = async (notificar) => {
     setSaving(true);
     setError('');
     try {
-      await onConfirm(reclamo.id, comentario.trim());
+      await onConfirm(reclamo.id, notificar);
     } catch (err) {
       setError(err.message || 'Error al resolver el reclamo');
       setSaving(false);
@@ -23,22 +20,18 @@ const ResolveDialog = ({ reclamo, onConfirm, onCancel }) => {
     <div className="resolve-overlay" onClick={onCancel}>
       <div className="resolve-dialog" onClick={e => e.stopPropagation()}>
         <h3>Marcar como Resuelto</h3>
+        <div className="resolve-reclamo-id">{reclamo?.id}</div>
         <p className="resolve-hint">
-          Ingresá un comentario de resolución. Este mensaje será enviado al vecino por WhatsApp.
+          ¿Querés enviar un mensaje al ciudadano por WhatsApp notificando la resolución?
         </p>
-        <textarea
-          className="resolve-textarea"
-          placeholder="Ej: El problema fue solucionado por el equipo de Alumbrado el día de hoy..."
-          value={comentario}
-          onChange={e => setComentario(e.target.value)}
-          rows={4}
-          autoFocus
-        />
         {error && <div className="resolve-error">{error}</div>}
         <div className="resolve-actions">
           <button className="resolve-btn-cancel" onClick={onCancel} disabled={saving}>Cancelar</button>
-          <button className="resolve-btn-confirm" onClick={handleConfirm} disabled={!comentario.trim() || saving}>
-            {saving ? 'Guardando...' : 'Confirmar Resolución'}
+          <button className="resolve-btn-no" onClick={() => handleConfirm(false)} disabled={saving}>
+            {saving ? 'Guardando...' : 'No enviar'}
+          </button>
+          <button className="resolve-btn-confirm" onClick={() => handleConfirm(true)} disabled={saving}>
+            {saving ? 'Guardando...' : 'Sí, enviar'}
           </button>
         </div>
       </div>

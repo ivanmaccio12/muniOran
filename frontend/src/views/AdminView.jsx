@@ -8,13 +8,19 @@ import DiscardDialog from '../components/DiscardDialog.jsx';
 import FilterBar from '../components/FilterBar';
 import './AdminView.css';
 
+const getDefaultDateFrom = () => {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 2);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
 const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardReclamo, resolveReclamo, applySuggestion, getNextEstado, getPrevEstado, addComentario, fetchReclamo }) => {
   const { getWorkerName } = useUsers();
   const [selectedReclamo, setSelectedReclamo] = useState(null);
-  const [resolveTarget, setResolveTarget] = useState(null); // id of reclamo pending resolution
-  const [discardTarget, setDiscardTarget] = useState(null); // id of reclamo pending discard
-  const [draggedId, setDraggedId] = useState(null);
-  const [filters, setFilters] = useState({ search: '', equipo: '', motivo: '', estado: '' });
+  const [resolveTarget, setResolveTarget] = useState(null);
+  const [discardTarget, setDiscardTarget] = useState(null);
+  const [filters, setFilters] = useState({ search: '', equipo: '', motivo: '', estado: '', dateFrom: getDefaultDateFrom(), dateTo: null });
 
   const filteredReclamos = useMemo(() => {
     return reclamos.filter(r => {
@@ -31,6 +37,12 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
       if (filters.equipo && r.equipo !== filters.equipo) return false;
       if (filters.motivo && r.motivo !== filters.motivo) return false;
       if (filters.estado && r.estado !== filters.estado) return false;
+      if (filters.dateFrom && new Date(r.timestamp) < filters.dateFrom) return false;
+      if (filters.dateTo) {
+        const to = new Date(filters.dateTo);
+        to.setHours(23, 59, 59, 999);
+        if (new Date(r.timestamp) > to) return false;
+      }
       return true;
     });
   }, [reclamos, filters]);
@@ -41,7 +53,6 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
       grouped[col.id] = filteredReclamos
         .filter(r => r.estado === col.id)
         .sort((a, b) => {
-          // Non-resolved: oldest first. Resolved: newest first.
           if (['resuelto', 'descartado'].includes(col.id)) return new Date(b.timestamp) - new Date(a.timestamp);
           return new Date(a.timestamp) - new Date(b.timestamp);
         });
@@ -62,27 +73,6 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
       return false;
     }
     return true;
-  };
-
-  const handleDragStart = (e, id) => { setDraggedId(id); e.dataTransfer.effectAllowed = 'move'; };
-  const handleDrop = (e, newEstado) => {
-    if (draggedId) {
-      if (newEstado === 'resuelto') {
-        setResolveTarget(draggedId);
-        setDraggedId(null);
-        return;
-      }
-      if (newEstado === 'descartado') {
-        setDiscardTarget(draggedId);
-        setDraggedId(null);
-        return;
-      }
-      const r = reclamos.find(x => x.id === draggedId);
-      if (checkCanMoveToAsignado(r, newEstado)) {
-        moveEstado(draggedId, newEstado);
-      }
-      setDraggedId(null);
-    }
   };
 
   const handleMoveNext = (id) => {
@@ -115,8 +105,8 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
     setSelectedReclamo(full);
   };
 
-  const handleResolveConfirm = async (id, comentario) => {
-    await resolveReclamo(id, comentario);
+  const handleResolveConfirm = async (id, notificar) => {
+    await resolveReclamo(id, notificar);
     setResolveTarget(null);
     setSelectedReclamo(null);
   };
@@ -167,8 +157,6 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
               key={col.id}
               column={col}
               reclamos={reclamosByEstado[col.id] || []}
-              onDragStart={handleDragStart}
-              onDrop={handleDrop}
               onCardClick={handleCardClick}
               onMoveNext={!isLast ? handleMoveNext : null}
               onMovePrev={!isFirst ? handleMovePrev : null}

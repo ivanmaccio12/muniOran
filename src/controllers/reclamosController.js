@@ -1,4 +1,4 @@
-import { getAllReclamos, getReclamoById, updateReclamo, addComentario, getComentarios, createReclamo, getUserById, getCommentCountForReclamo } from '../services/db.js';
+import { getAllReclamos, getReclamoById, updateReclamo, addComentario, getComentarios, createReclamo, getUserById } from '../services/db.js';
 import { sendWhatsApp } from '../services/whatsappService.js';
 import { sendAssignmentEmail } from '../services/emailService.js';
 
@@ -31,15 +31,7 @@ export const patchReclamo = async (req, res) => {
     const { id } = req.params;
     const { comentario_resolucion, notificar, ...fields } = req.body;
 
-    // Validación: pasar a resuelto requiere comentario
-    if (fields.estado === 'resuelto') {
-      const existingComments = getCommentCountForReclamo(id);
-      if (!comentario_resolucion && existingComments === 0) {
-        return res.status(400).json({ error: 'Se requiere un comentario de resolución para marcar como resuelto' });
-      }
-    }
-
-    // Auto-guardar comentario de resolución antes de cambiar estado
+    // Auto-guardar comentario de resolución antes de cambiar estado (si se provee)
     if (comentario_resolucion) {
       const autor = req.user?.nombre || 'Sistema';
       const rol = req.user?.equipo || req.user?.rol || 'Administración';
@@ -71,12 +63,10 @@ export const patchReclamo = async (req, res) => {
     const debeNotificar = notificar !== false; // true por defecto
     if (fields.estado === 'resuelto' || (fields.estado === 'descartado' && debeNotificar)) {
       let mensaje;
-      if (fields.estado === 'resuelto' && comentario_resolucion) {
-        // Enviar exactamente el mensaje modificado por el usuario
-        mensaje = comentario_resolucion;
+      if (fields.estado === 'resuelto') {
+        mensaje = updated.id;
       } else {
-        const estadoLabel = 'DESCARTADO ❌';
-        mensaje = `🏛️ *Municipalidad de Orán*\n\nHola *${updated.nombre_apellido}*, te informamos que tu reclamo ha sido *${estadoLabel}*.\n\nMotivo: ${updated.motivo}\nDescripción: ${updated.descripcion}\nDirección: ${updated.direccion}`;
+        mensaje = `🏛️ *Municipalidad de Orán*\n\nHola *${updated.nombre_apellido}*, te informamos que tu reclamo ha sido *DESCARTADO ❌*.\n\nMotivo: ${updated.motivo}\nDescripción: ${updated.descripcion}\nDirección: ${updated.direccion}`;
       }
       sendWhatsApp(updated.telefono, mensaje);
       updateReclamo(id, { notificado: 1 });

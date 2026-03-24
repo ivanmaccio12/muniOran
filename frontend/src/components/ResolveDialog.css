@@ -9,7 +9,7 @@
   background: var(--bg-secondary, #fff);
   border: 1px solid var(--border-color, #e0e0e0);
   border-radius: 12px; padding: 1.75rem;
-  width: 100%; max-width: 480px;
+  width: 100%; max-width: 420px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.15);
 }
 
@@ -18,44 +18,53 @@
   color: var(--text-primary, #1a1a2e);
 }
 
+.resolve-reclamo-id {
+  font-family: monospace; font-size: 1rem; font-weight: 700;
+  color: var(--brand-green, #008d48);
+  background: rgba(0,141,72,0.08); border: 1px solid rgba(0,141,72,0.2);
+  border-radius: 8px; padding: 8px 14px;
+  margin-bottom: 1rem; text-align: center; letter-spacing: 1px;
+}
+
 .resolve-hint {
-  margin: 0 0 1rem; font-size: 0.88rem;
+  margin: 0 0 1.25rem; font-size: 0.9rem;
   color: var(--text-secondary, #666); line-height: 1.5;
 }
 
-.resolve-textarea {
-  width: 100%; padding: 0.65rem 0.85rem;
-  border: 1px solid var(--border-color, #ddd); border-radius: 8px;
-  font-size: 0.92rem; font-family: inherit;
-  background: var(--bg-primary, #f9f9f9); color: var(--text-primary, #1a1a2e);
-  resize: vertical; box-sizing: border-box;
-  transition: border-color 0.2s;
-}
-.resolve-textarea:focus { outline: none; border-color: #27ae60; }
-
 .resolve-error {
-  margin-top: 0.5rem; padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem; padding: 0.5rem 0.75rem;
   background: #fdecea; color: #c0392b;
   border-radius: 7px; font-size: 0.85rem;
 }
 
 .resolve-actions {
-  display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;
+  display: flex; gap: 0.65rem; justify-content: flex-end;
 }
 
 .resolve-btn-cancel {
-  padding: 0.55rem 1.2rem; border-radius: 8px;
+  padding: 0.55rem 1rem; border-radius: 8px;
   border: 1px solid var(--border-color, #ddd);
   background: transparent; color: var(--text-secondary, #666);
-  font-size: 0.9rem; cursor: pointer;
+  font-size: 0.88rem; cursor: pointer;
 }
 .resolve-btn-cancel:hover { background: var(--bg-primary, #f5f5f5); }
+.resolve-btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.resolve-btn-no {
+  padding: 0.55rem 1.1rem; border-radius: 8px;
+  border: 1px solid var(--border-color, #ddd);
+  background: var(--bg-surface, #f9f9f9); color: var(--text-secondary, #555);
+  font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+.resolve-btn-no:hover:not(:disabled) { background: var(--bg-primary, #eee); }
+.resolve-btn-no:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .resolve-btn-confirm {
-  padding: 0.55rem 1.4rem; border-radius: 8px;
+  padding: 0.55rem 1.3rem; border-radius: 8px;
   background: #27ae60; color: #fff; border: none;
-  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  font-size: 0.88rem; font-weight: 600; cursor: pointer;
   transition: background 0.2s;
 }
 .resolve-btn-confirm:hover:not(:disabled) { background: #1e8449; }
-.resolve-btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+.resolve-btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }

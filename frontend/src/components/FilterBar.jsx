@@ -1,6 +1,12 @@
 import { EQUIPOS, MOTIVOS } from '../data/mockReclamos';
 import './FilterBar.css';
 
+const toInputDate = (d) => {
+  if (!d) return '';
+  const date = d instanceof Date ? d : new Date(d);
+  return date.toISOString().slice(0, 10);
+};
+
 const FilterBar = ({ filters, onFilterChange, showEquipo = true, showSearch = true }) => {
   return (
     <div className="filter-bar">
@@ -51,6 +57,26 @@ const FilterBar = ({ filters, onFilterChange, showEquipo = true, showSearch = tr
         <option value="resuelto">Resuelto</option>
         <option value="descartado">Descartado</option>
       </select>
+
+      <div className="filter-dates">
+        <label className="filter-date-label">Desde</label>
+        <input
+          type="date"
+          className="filter-date-input"
+          value={toInputDate(filters.dateFrom)}
+          onChange={(e) => onFilterChange({ ...filters, dateFrom: e.target.value ? new Date(e.target.value + 'T00:00:00') : null })}
+        />
+        <label className="filter-date-label">Hasta</label>
+        <input
+          type="date"
+          className="filter-date-input"
+          value={toInputDate(filters.dateTo)}
+          onChange={(e) => onFilterChange({ ...filters, dateTo: e.target.value ? new Date(e.target.value + 'T00:00:00') : null })}
+        />
+        {(filters.dateFrom || filters.dateTo) && (
+          <button className="filter-clear" title="Limpiar fechas" onClick={() => onFilterChange({ ...filters, dateFrom: null, dateTo: null })}>✕</button>
+        )}
+      </div>
     </div>
   );
 };

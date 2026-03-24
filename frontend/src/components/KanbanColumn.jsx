@@ -1,13 +1,9 @@
 import KanbanCard from './KanbanCard';
 import './KanbanColumn.css';
 
-const KanbanColumn = ({ column, reclamos, onDragStart, onDragOver, onDrop, onCardClick, onMoveNext, onMovePrev, onDiscard, onApplySuggestion, showArrows, readOnly, getWorkerName }) => {
+const KanbanColumn = ({ column, reclamos, onCardClick, onMoveNext, onMovePrev, onDiscard, onApplySuggestion, showArrows, readOnly, getWorkerName }) => {
   return (
-    <div
-      className="kanban-column"
-      onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
-      onDrop={(e) => { e.preventDefault(); onDrop && onDrop(e, column.id); }}
-    >
+    <div className="kanban-column">
       <div className="column-header">
         <div className="column-title-row">
           <span className="column-icon">{column.icon}</span>
@@ -27,7 +23,6 @@ const KanbanColumn = ({ column, reclamos, onDragStart, onDragOver, onDrop, onCar
             <KanbanCard
               key={r.id}
               reclamo={r}
-              onDragStart={onDragStart}
               onClick={onCardClick}
               onMoveNext={onMoveNext}
               onMovePrev={onMovePrev}

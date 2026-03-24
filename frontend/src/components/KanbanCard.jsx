@@ -1,9 +1,9 @@
 import './KanbanCard.css';
 
-const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onDiscard, onApplySuggestion, showArrows = true, readOnly = false, getWorkerName = () => null }) => {
+const KanbanCard = ({ reclamo, onClick, onMoveNext, onMovePrev, onDiscard, onApplySuggestion, showArrows = true, readOnly = false, getWorkerName = () => null }) => {
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/Argentina/Buenos_Aires' });
   };
 
   const getMotivoBadgeClass = (motivo) => {
@@ -39,11 +39,11 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
   return (
     <div
       className={`kanban-card ${readOnly ? 'read-only' : ''} ${reclamo.solicita_update ? 'has-update-request' : ''}`}
-      draggable={!readOnly}
-      onDragStart={(e) => onDragStart && onDragStart(e, reclamo.id)}
-      onDragOver={(e) => e.preventDefault()}
       onClick={() => onClick && onClick(reclamo)}
     >
+      {/* Reclamo ID as title */}
+      <div className="card-id-title">{reclamo.id}</div>
+
       {/* Top Row: Motivo + badges */}
       <div className="card-header">
         <span className={`motivo-badge ${getMotivoBadgeClass(reclamo.motivo)}`}>{reclamo.motivo}</span>
@@ -95,10 +95,9 @@ const KanbanCard = ({ reclamo, onDragStart, onClick, onMoveNext, onMovePrev, onD
         </button>
       )}
 
-      {/* Footer: ID + Comments count + Actions */}
+      {/* Footer: Comments count + Actions */}
       <div className="card-footer">
         <div className="card-footer-left">
-          <span className="card-id">{reclamo.id}</span>
           {commentCount > 0 && (
             <span className="card-comments-count" title={`${commentCount} comentario(s)`}>💬 {commentCount}</span>
           )}

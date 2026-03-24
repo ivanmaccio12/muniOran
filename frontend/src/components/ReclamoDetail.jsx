@@ -1,30 +1,71 @@
-import { useState } from 'react';
-import { COLUMNS_ADMIN, EQUIPOS, MOTIVOS, MOTIVO_TO_EQUIPO } from '../data/mockReclamos';
+import { useState, useEffect } from 'react';
+import { COLUMNS_ADMIN, EQUIPOS, MOTIVOS } from '../data/mockReclamos';
 import { useUsers } from '../hooks/useUsers.js';
 import './ReclamoDetail.css';
 
 const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAssign, onAddComentario, onSolicitarUpdate, readOnly = false, currentWorker = null }) => {
   const [nuevoComentario, setNuevoComentario] = useState('');
   const { workers, getWorkerName } = useUsers();
-  const workerName = reclamo.asignado_a ? getWorkerName(reclamo.asignado_a) : null;
+
+  // Local assignment state — only saved on ACEPTAR
+  const [localMotivo, setLocalMotivo] = useState(reclamo?.motivo || '');
+  const [localEquipo, setLocalEquipo] = useState(reclamo?.equipo || '');
+  const [localAsignado, setLocalAsignado] = useState(reclamo?.asignado_a || '');
+  const [savingAssign, setSavingAssign] = useState(false);
+
+  // Reset local state when reclamo changes
+  useEffect(() => {
+    setLocalMotivo(reclamo?.motivo || '');
+    setLocalEquipo(reclamo?.equipo || '');
+    setLocalAsignado(reclamo?.asignado_a || '');
+  }, [reclamo?.id]);
+
+  // When equipo changes, filter workers and auto-select first from that equipo
+  const handleEquipoChange = (equipo) => {
+    setLocalEquipo(equipo);
+    const workersInEquipo = workers.filter(w => w.equipo === equipo);
+    // Keep current asignado if they belong to new equipo, otherwise auto-select first
+    const currentStillValid = localAsignado && workersInEquipo.some(w => w.id === localAsignado);
+    setLocalAsignado(currentStillValid ? localAsignado : (workersInEquipo[0]?.id || ''));
+  };
+
+  // Workers filtered by selected equipo
+  const filteredWorkers = localEquipo
+    ? workers.filter(w => w.equipo === localEquipo)
+    : workers;
+
+  // Detect pending changes
+  const hasChanges = localMotivo !== reclamo?.motivo || localEquipo !== (reclamo?.equipo || '') || localAsignado !== (reclamo?.asignado_a || '');
+
+  const handleAcceptarAsignacion = async () => {
+    setSavingAssign(true);
+    try {
+      if (localMotivo !== reclamo.motivo && onUpdateMotivo) {
+        await onUpdateMotivo(reclamo.id, localMotivo);
+      }
+      if ((localEquipo !== (reclamo.equipo || '') || localAsignado !== (reclamo.asignado_a || '')) && onAssign) {
+        await onAssign(reclamo.id, localAsignado, localEquipo);
+      }
+    } finally {
+      setSavingAssign(false);
+    }
+  };
 
   if (!reclamo) return null;
 
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' });
   };
 
   const formatShortDate = (dateStr) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' });
   };
 
   const mapsUrl = reclamo.coordenadas
     ? `https://www.google.com/maps?q=${reclamo.coordenadas}`
     : `https://www.google.com/maps/search/${encodeURIComponent(reclamo.direccion + ', Orán, Salta, Argentina')}`;
-
-  const suggestedEquipo = MOTIVO_TO_EQUIPO[reclamo.motivo];
 
   const handleSubmitComment = () => {
     if (!nuevoComentario.trim()) return;
@@ -43,6 +84,8 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
   return (
     <div className="detail-overlay" onClick={onClose}>
       <div className="detail-panel" onClick={(e) => e.stopPropagation()}>
+
+        {/* Close button — outside content flow, always visible */}
         <button className="detail-close" onClick={onClose}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -104,8 +147,6 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
             <span>{reclamo.direccion} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
           </div>
           {reclamo.barrio && <div className="detail-field"><label>🏘️ Barrio</label><span>{reclamo.barrio}</span></div>}
-          {reclamo.equipo && <div className="detail-field"><label>🏢 Equipo</label><span>{reclamo.equipo}</span></div>}
-          {workerName && <div className="detail-field"><label>👤 Asignado a</label><span>{workerName}</span></div>}
         </div>
 
         {/* Share */}
@@ -116,14 +157,13 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
           <span className="share-url">{reclamo.id}</span>
         </div>
 
-        {/* ==================== COMMENTS SECTION ==================== */}
+        {/* Comments */}
         <div className="comments-section">
           <h4 className="comments-title">
             💬 Comentarios y Actualizaciones
             <span className="comments-count">{reclamo.comentarios?.length || 0}</span>
           </h4>
 
-          {/* Comment list */}
           <div className="comments-list">
             {(!reclamo.comentarios || reclamo.comentarios.length === 0) ? (
               <div className="comments-empty">
@@ -146,7 +186,6 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
             )}
           </div>
 
-          {/* Add comment (admin/worker only) */}
           {!readOnly && onAddComentario && (
             <div className="comment-input-area">
               <textarea
@@ -164,7 +203,6 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
             </div>
           )}
 
-          {/* Public: Request update */}
           {readOnly && onSolicitarUpdate && !reclamo.solicita_update && !['resuelto', 'descartado'].includes(reclamo.estado) && (
             <button className="request-update-btn" onClick={() => onSolicitarUpdate(reclamo.id)}>
               ❗ Solicitar actualización del estado
@@ -194,39 +232,39 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
               </div>
             </div>
 
-            <div className="detail-action-group">
-              <label className="action-label">Categorizar Motivo</label>
-              <select className="motivo-select" value={reclamo.motivo}
-                onChange={(e) => onUpdateMotivo(reclamo.id, e.target.value)}>
-                {MOTIVOS.map((m) => <option key={m} value={m}>{m}</option>)}
-              </select>
-            </div>
-
-            {onAssign && (
-              <div className="detail-action-group">
-                <label className="action-label">Asignar Equipo / Persona</label>
-                <div className="assign-row">
-                  <select className="motivo-select" value={reclamo.equipo || ''}
-                    onChange={(e) => onAssign(reclamo.id, reclamo.asignado_a, e.target.value)}>
+            {/* Assignment section with ACEPTAR button */}
+            <div className="detail-action-group assign-group">
+              <label className="action-label">Asignación</label>
+              <div className="assign-fields">
+                <div className="assign-field">
+                  <label className="assign-sublabel">Motivo / Categoría</label>
+                  <select className="motivo-select" value={localMotivo} onChange={(e) => setLocalMotivo(e.target.value)}>
+                    {MOTIVOS.map((m) => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                </div>
+                <div className="assign-field">
+                  <label className="assign-sublabel">Equipo</label>
+                  <select className="motivo-select" value={localEquipo} onChange={(e) => handleEquipoChange(e.target.value)}>
                     <option value="">Sin equipo</option>
                     {EQUIPOS.map(eq => <option key={eq} value={eq}>{eq}</option>)}
                   </select>
-                  <select className="motivo-select" value={reclamo.asignado_a || ''}
-                    onChange={(e) => onAssign(reclamo.id, e.target.value, reclamo.equipo)}>
+                </div>
+                <div className="assign-field">
+                  <label className="assign-sublabel">Persona responsable</label>
+                  <select className="motivo-select" value={localAsignado} onChange={(e) => setLocalAsignado(e.target.value)}>
                     <option value="">Sin asignar</option>
-                    {workers.map(w => <option key={w.id} value={w.id}>{w.nombre} ({w.equipo})</option>)}
+                    {filteredWorkers.map(w => <option key={w.id} value={w.id}>{w.nombre}</option>)}
                   </select>
                 </div>
-                {suggestedEquipo && reclamo.equipo !== suggestedEquipo && (
-                  <div className="suggestion-box">
-                    <span>💡 Sugerido: <strong>{suggestedEquipo}</strong></span>
-                    <button className="apply-suggestion-btn" onClick={() => onAssign(reclamo.id, reclamo.asignado_a, suggestedEquipo)}>
-                      Asignar a este equipo
-                    </button>
-                  </div>
-                )}
               </div>
-            )}
+              <button
+                className={`assign-accept-btn ${hasChanges ? 'has-changes' : ''}`}
+                onClick={handleAcceptarAsignacion}
+                disabled={!hasChanges || savingAssign}
+              >
+                {savingAssign ? 'Guardando...' : '✔ Aceptar'}
+              </button>
+            </div>
           </div>
         )}
       </div>

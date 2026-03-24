@@ -11,10 +11,6 @@
   transition: border-color var(--transition-normal);
 }
 
-.kanban-column.drag-over {
-  border-color: var(--accent-indigo);
-  box-shadow: var(--shadow-glow-indigo);
-}
 
 .column-header {
   padding: 18px 18px 0;

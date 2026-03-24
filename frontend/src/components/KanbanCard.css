@@ -3,7 +3,7 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: 14px 16px 10px;
-  cursor: grab;
+  cursor: pointer;
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
@@ -11,6 +11,12 @@
 }
 
 .kanban-card.read-only { cursor: default; }
+
+.card-id-title {
+  font-size: 0.72rem; font-weight: 700; font-family: monospace;
+  color: var(--brand-green); letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
 
 .kanban-card::before {
   content: '';
@@ -29,7 +35,7 @@
   box-shadow: var(--shadow-md);
 }
 .kanban-card:hover::before { opacity: 1; }
-.kanban-card:active:not(.read-only) { cursor: grabbing; transform: scale(0.98); }
+.kanban-card:active:not(.read-only) { transform: scale(0.98); }
 
 .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; flex-wrap: wrap; }
 

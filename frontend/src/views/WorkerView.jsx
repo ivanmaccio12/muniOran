@@ -8,18 +8,23 @@ import ResolveDialog from '../components/ResolveDialog.jsx';
 import FilterBar from '../components/FilterBar';
 import './WorkerView.css';
 
+const getDefaultDateFrom = () => {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 2);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
 const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNextEstado, getPrevEstado, addComentario, fetchReclamo }) => {
   const { user } = useAuth();
   const { workers, getWorkerName } = useUsers();
 
-  // equipo role: always their own reclamos; admin/gestor: can select any worker
   const [selectedWorker, setSelectedWorker] = useState(null);
   const effectiveWorker = user?.rol === 'equipo' ? user.id : (selectedWorker || user?.id);
 
   const [selectedReclamo, setSelectedReclamo] = useState(null);
   const [resolveTarget, setResolveTarget] = useState(null);
-  const [draggedId, setDraggedId] = useState(null);
-  const [filters, setFilters] = useState({ search: '', motivo: '', estado: '' });
+  const [filters, setFilters] = useState({ search: '', motivo: '', estado: '', dateFrom: getDefaultDateFrom(), dateTo: null });
 
   const myReclamos = useMemo(() => {
     return reclamos.filter(r => {
@@ -34,6 +39,12 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
       )) return false;
       if (filters.motivo && r.motivo !== filters.motivo) return false;
       if (filters.estado && r.estado !== filters.estado) return false;
+      if (filters.dateFrom && new Date(r.timestamp) < filters.dateFrom) return false;
+      if (filters.dateTo) {
+        const to = new Date(filters.dateTo);
+        to.setHours(23, 59, 59, 999);
+        if (new Date(r.timestamp) > to) return false;
+      }
       return true;
     });
   }, [reclamos, effectiveWorker, filters]);
@@ -50,19 +61,6 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
     });
     return grouped;
   }, [myReclamos]);
-
-  const handleDragStart = (e, id) => { setDraggedId(id); e.dataTransfer.effectAllowed = 'move'; };
-  const handleDrop = (_e, newEstado) => {
-    if (draggedId) {
-      if (newEstado === 'resuelto') {
-        setResolveTarget(draggedId);
-        setDraggedId(null);
-        return;
-      }
-      moveEstado(draggedId, newEstado);
-      setDraggedId(null);
-    }
-  };
 
   const handleMoveNext = (id) => {
     const r = reclamos.find(x => x.id === id);
@@ -81,8 +79,8 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
     setSelectedReclamo(full);
   };
 
-  const handleResolveConfirm = async (id, comentario) => {
-    await resolveReclamo(id, comentario);
+  const handleResolveConfirm = async (id, notificar) => {
+    await resolveReclamo(id, notificar);
     setResolveTarget(null);
     setSelectedReclamo(null);
   };
@@ -129,8 +127,6 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
             key={col.id}
             column={col}
             reclamos={reclamosByEstado[col.id] || []}
-            onDragStart={handleDragStart}
-            onDrop={handleDrop}
             onCardClick={async (r) => { const full = await fetchReclamo(r.id); setSelectedReclamo(full || r); }}
             onMoveNext={handleMoveNext}
             onMovePrev={handleMovePrev}
