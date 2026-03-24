@@ -23,7 +23,7 @@ export const EQUIPOS = [
 ];
 
 export const COLUMNS_ADMIN = [
-  { id: 'nuevo', title: 'Nuevo', color: '#6366f1', icon: '🆕', order: 0 },
+  { id: 'nuevo', title: 'Nuevo', color: '#f59e0b', icon: '🆕', order: 0 },
   { id: 'asignado', title: 'Asignado', color: '#3b82f6', icon: '👤', order: 1 },
   { id: 'resuelto', title: 'Resuelto', color: '#10b981', icon: '✅', order: 2 },
   { id: 'descartado', title: 'Descartado', color: '#ef4444', icon: '🚫', order: 3 },
