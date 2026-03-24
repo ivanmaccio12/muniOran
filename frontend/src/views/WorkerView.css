@@ -24,7 +24,9 @@
 }
 
 .kanban-board {
-  display: flex; gap: 14px; padding: 16px 20px; flex: 1; overflow-x: auto;
+  display: flex; gap: 14px; padding: 16px 20px; flex: 1;
+  overflow-x: auto; overflow-y: hidden;
+  align-items: stretch; min-height: 0;
 }
 
 @media (max-width: 768px) {
