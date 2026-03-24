@@ -99,27 +99,29 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
 
   return (
     <div className="worker-view">
-      <div className="worker-header">
-        <div className="worker-selector">
-          {user?.rol === 'equipo' ? (
-            <span className="worker-label">👤 {user.nombre} — {user.equipo}</span>
-          ) : (
-            <>
-              <label>👤 Ver reclamos de:</label>
-              <select value={selectedWorker || user?.id || ''} onChange={(e) => setSelectedWorker(e.target.value)}>
-                {workers.map(w => (
-                  <option key={w.id} value={w.id}>{w.nombre} — {w.equipo}</option>
-                ))}
-              </select>
-            </>
-          )}
+      <div className="worker-sticky-top">
+        <div className="worker-header">
+          <div className="worker-selector">
+            {user?.rol === 'equipo' ? (
+              <span className="worker-label">👤 {user.nombre} — {user.equipo}</span>
+            ) : (
+              <>
+                <label>👤 Ver reclamos de:</label>
+                <select value={selectedWorker || user?.id || ''} onChange={(e) => setSelectedWorker(e.target.value)}>
+                  {workers.map(w => (
+                    <option key={w.id} value={w.id}>{w.nombre} — {w.equipo}</option>
+                  ))}
+                </select>
+              </>
+            )}
+          </div>
+          <div className="worker-info">
+            <span className="worker-count">{myReclamos.length} reclamos asignados</span>
+          </div>
         </div>
-        <div className="worker-info">
-          <span className="worker-count">{myReclamos.length} reclamos asignados</span>
-        </div>
-      </div>
 
-      <FilterBar filters={filters} onFilterChange={setFilters} showEquipo={false} />
+        <FilterBar filters={filters} onFilterChange={setFilters} showEquipo={false} />
+      </div>
 
       <div className="kanban-board">
         {COLUMNS_WORKER.map(col => (

@@ -4,7 +4,10 @@
       "Bash(npm install:*)",
       "Bash(node --input-type=module:*)",
       "Bash(npm run:*)",
-      "Bash(node scripts/scrapeOran.js)"
+      "Bash(node scripts/scrapeOran.js)",
+      "Bash(start chrome:*)",
+      "Bash(node \"c:/Users/andre/Desktop/Chatbots/muniOran/deploy_vps.js\")",
+      "Bash(xargs ls:*)"
     ]
   }
 }

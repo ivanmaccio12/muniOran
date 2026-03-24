@@ -1,5 +1,12 @@
 .admin-view { display: flex; flex-direction: column; flex: 1; }
 
+.admin-sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg-secondary);
+}
+
 .admin-header {
   padding: 12px 24px;
   display: flex;

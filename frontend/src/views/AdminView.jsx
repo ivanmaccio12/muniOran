@@ -137,16 +137,18 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
 
   return (
     <div className="admin-view">
-      <div className="admin-header">
-        <div className="admin-stats">
-          <div className="stat-pill"><span className="stat-num">{stats.total}</span><span className="stat-lbl">Total</span></div>
-          <div className="stat-pill s-new"><span className="stat-num">{stats.nuevos}</span><span className="stat-lbl">Nuevos</span></div>
-          <div className="stat-pill s-pend"><span className="stat-num">{stats.pending}</span><span className="stat-lbl">Pendientes</span></div>
-          <div className="stat-pill s-done"><span className="stat-num">{stats.resueltos}</span><span className="stat-lbl">Resueltos</span></div>
+      <div className="admin-sticky-top">
+        <div className="admin-header">
+          <div className="admin-stats">
+            <div className="stat-pill"><span className="stat-num">{stats.total}</span><span className="stat-lbl">Total</span></div>
+            <div className="stat-pill s-new"><span className="stat-num">{stats.nuevos}</span><span className="stat-lbl">Nuevos</span></div>
+            <div className="stat-pill s-pend"><span className="stat-num">{stats.pending}</span><span className="stat-lbl">Pendientes</span></div>
+            <div className="stat-pill s-done"><span className="stat-num">{stats.resueltos}</span><span className="stat-lbl">Resueltos</span></div>
+          </div>
         </div>
-      </div>
 
-      <FilterBar filters={filters} onFilterChange={setFilters} />
+        <FilterBar filters={filters} onFilterChange={setFilters} />
+      </div>
 
       <div className="kanban-board">
         {COLUMNS_ADMIN.map(col => {
