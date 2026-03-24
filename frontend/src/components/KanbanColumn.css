@@ -14,7 +14,12 @@
 
 
 .column-header {
-  padding: 18px 18px 0;
+  padding: 14px 18px 0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .column-title-row {

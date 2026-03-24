@@ -1,6 +1,6 @@
 import './KanbanCard.css';
 
-const KanbanCard = ({ reclamo, onClick, onMoveNext, onMovePrev, onDiscard, onApplySuggestion, showArrows = true, readOnly = false, getWorkerName = () => null }) => {
+const KanbanCard = ({ reclamo, onClick, onMoveNext, onMovePrev, onDiscard, onApplySuggestion, showArrows = true, readOnly = false, getWorkerName = () => null, columnColor = null }) => {
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/Argentina/Buenos_Aires' });
@@ -39,6 +39,7 @@ const KanbanCard = ({ reclamo, onClick, onMoveNext, onMovePrev, onDiscard, onApp
   return (
     <div
       className={`kanban-card ${readOnly ? 'read-only' : ''} ${reclamo.solicita_update ? 'has-update-request' : ''}`}
+      style={columnColor ? { borderLeft: `3px solid ${columnColor}`, background: `${columnColor}0d` } : undefined}
       onClick={() => onClick && onClick(reclamo)}
     >
       {/* Reclamo ID as title */}

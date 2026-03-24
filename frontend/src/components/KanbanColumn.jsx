@@ -31,6 +31,7 @@ const KanbanColumn = ({ column, reclamos, onCardClick, onMoveNext, onMovePrev, o
               showArrows={showArrows}
               readOnly={readOnly}
               getWorkerName={getWorkerName}
+              columnColor={column.color}
             />
           ))
         )}
