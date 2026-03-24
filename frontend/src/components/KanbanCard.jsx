@@ -51,7 +51,7 @@ const KanbanCard = ({ reclamo, onClick, onMoveNext, onMovePrev, onDiscard, onApp
           <span className="update-request-badge" title="El vecino solicita una actualización">❗</span>
         )}
         {reclamo.notificado && (
-          <span className="notificado-badge" title="Mensaje enviado al vecino por WhatsApp">📨 Notificado</span>
+          <span className="notificado-badge" title="Mensaje enviado al vecino por WhatsApp">📨 Ciudadano Notificado</span>
         )}
       </div>
       <span className="card-date">{formatDate(reclamo.timestamp)}</span>
