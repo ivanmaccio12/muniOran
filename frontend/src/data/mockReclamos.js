@@ -133,9 +133,8 @@ export const useReclamos = () => {
     }
   };
 
-  // Resolve reclamo — requires a comentario (enforced by backend too)
-  const resolveReclamo = (id, comentario_resolucion) =>
-    patchAndRefresh(id, { estado: 'resuelto', comentario_resolucion });
+  const resolveReclamo = (id, notificar = true) =>
+    patchAndRefresh(id, { estado: 'resuelto', notificar });
 
   const applySuggestion = (reclamo) =>
     patchAndRefresh(reclamo.id, {
