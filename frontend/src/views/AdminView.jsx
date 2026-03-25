@@ -10,7 +10,7 @@ import './AdminView.css';
 
 const getDefaultDateFrom = () => {
   const d = new Date();
-  d.setMonth(d.getMonth() - 2);
+  d.setMonth(d.getMonth() - 3);
   d.setHours(0, 0, 0, 0);
   return d;
 };
