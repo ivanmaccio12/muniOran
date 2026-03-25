@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { COLUMNS_ADMIN, EQUIPOS, MOTIVOS } from '../data/mockReclamos';
+import { COLUMNS_ADMIN, MOTIVOS } from '../data/mockReclamos';
 import { useUsers } from '../hooks/useUsers.js';
 import './ReclamoDetail.css';
 
 const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAssign, onAddComentario, onSolicitarUpdate, readOnly = false, currentWorker = null }) => {
   const [nuevoComentario, setNuevoComentario] = useState('');
   const { workers, getWorkerName } = useUsers();
+  const equipos = [...new Set(workers.map(w => w.equipo).filter(Boolean))].sort();
 
   // Local assignment state — only saved on ACEPTAR
   const [localMotivo, setLocalMotivo] = useState(reclamo?.motivo || '');
@@ -246,7 +247,7 @@ const ReclamoDetail = ({ reclamo, onClose, onUpdateEstado, onUpdateMotivo, onAss
                   <label className="assign-sublabel">Equipo</label>
                   <select className="motivo-select" value={localEquipo} onChange={(e) => handleEquipoChange(e.target.value)}>
                     <option value="">Sin equipo</option>
-                    {EQUIPOS.map(eq => <option key={eq} value={eq}>{eq}</option>)}
+                    {equipos.map(eq => <option key={eq} value={eq}>{eq}</option>)}
                   </select>
                 </div>
                 <div className="assign-field">

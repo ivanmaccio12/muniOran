@@ -34,7 +34,7 @@ app.post('/api/auth/login', postLogin);
 app.get('/api/auth/me', requireAuth, getMe);
 
 // ============= USERS API =============
-app.get('/api/users', requireAuth, requireRole('admin', 'gestor'), listUsers);
+app.get('/api/users', requireAuth, requireRole('admin', 'gestor', 'equipo'), listUsers);
 app.post('/api/users', requireAuth, requireRole('admin', 'gestor'), postUser);
 app.patch('/api/users/:id', requireAuth, requireRole('admin', 'gestor'), patchUser);
 app.delete('/api/users/:id', requireAuth, requireRole('admin'), deleteUser);

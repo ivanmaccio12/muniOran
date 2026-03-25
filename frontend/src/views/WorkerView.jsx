@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { COLUMNS_WORKER } from '../data/mockReclamos';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useUsers } from '../hooks/useUsers.js';
@@ -20,6 +20,14 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
   const { workers, getWorkerName } = useUsers();
 
   const [selectedWorker, setSelectedWorker] = useState(null);
+
+  // Default to first worker for admin/gestor when workers load
+  useEffect(() => {
+    if (user?.rol !== 'equipo' && !selectedWorker && workers.length > 0) {
+      setSelectedWorker(workers[0].id);
+    }
+  }, [workers, user?.rol]);
+
   const effectiveWorker = user?.rol === 'equipo' ? user.id : (selectedWorker || user?.id);
 
   const [selectedReclamo, setSelectedReclamo] = useState(null);

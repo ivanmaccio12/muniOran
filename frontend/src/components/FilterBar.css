@@ -58,6 +58,26 @@
 }
 .filter-clear:hover { color: var(--accent-red); }
 
+/* Dark mode: force calendar picker icon to be visible */
+[data-theme="dark"] .filter-date-input {
+  color-scheme: dark;
+}
+
+/* Last week toggle button */
+.filter-week-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 13px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-color); background: var(--bg-input);
+  color: var(--text-secondary); font-size: 0.8rem;
+  font-family: 'Poppins', sans-serif; cursor: pointer; white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+.filter-week-btn:hover { border-color: var(--brand-green); color: var(--brand-green); }
+.filter-week-btn.active {
+  background: rgba(0,141,72,0.12); border-color: var(--brand-green);
+  color: var(--brand-green); font-weight: 600;
+}
+
 @media (max-width: 768px) {
   .filter-bar { padding: 10px 14px; gap: 8px; }
   .filter-search { flex: 1 1 100%; }
