@@ -62,10 +62,7 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
     COLUMNS_WORKER.forEach(col => {
       grouped[col.id] = myReclamos
         .filter(r => r.estado === col.id)
-        .sort((a, b) => {
-          if (col.id === 'resuelto') return new Date(b.timestamp) - new Date(a.timestamp);
-          return new Date(a.timestamp) - new Date(b.timestamp);
-        });
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     });
     return grouped;
   }, [myReclamos]);

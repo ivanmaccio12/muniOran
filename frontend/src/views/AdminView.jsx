@@ -52,10 +52,7 @@ const AdminView = ({ reclamos, moveEstado, assignWorker, updateMotivo, discardRe
     COLUMNS_ADMIN.forEach(col => {
       grouped[col.id] = filteredReclamos
         .filter(r => r.estado === col.id)
-        .sort((a, b) => {
-          if (['resuelto', 'descartado'].includes(col.id)) return new Date(b.timestamp) - new Date(a.timestamp);
-          return new Date(a.timestamp) - new Date(b.timestamp);
-        });
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     });
     return grouped;
   }, [filteredReclamos]);
