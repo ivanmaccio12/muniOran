@@ -43,7 +43,9 @@ const WorkerView = ({ reclamos, moveEstado, resolveReclamo, updateMotivo, getNex
         r.nombre_apellido.toLowerCase().includes(term) ||
         r.descripcion.toLowerCase().includes(term) ||
         r.direccion.toLowerCase().includes(term) ||
-        r.motivo.toLowerCase().includes(term)
+        r.motivo.toLowerCase().includes(term) ||
+        r.barrio?.toLowerCase().includes(term) ||
+        r.dni.includes(term)
       )) return false;
       if (filters.motivo && r.motivo !== filters.motivo) return false;
       if (filters.estado && r.estado !== filters.estado) return false;
