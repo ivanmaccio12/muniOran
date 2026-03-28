@@ -56,8 +56,16 @@ export const chatController = async (req, res) => {
             return res.status(400).json({ error: 'El campo session_id es requerido (usar el número de teléfono del usuario).' });
         }
 
-        // Perform Retrieval-Augmented Generation (RAG)
-        const relevantDocs = await searchKnowledge(message);
+        // RAG + live data en paralelo, con timeout máximo de 6s para live data
+        const LIVE_TIMEOUT_MS = 6000;
+        const [relevantDocs, liveDocs] = await Promise.all([
+            searchKnowledge(message).catch(e => { console.error('[chatController] RAG error:', e.message); return []; }),
+            Promise.race([
+                getLiveContext(message).catch(e => { console.error('[chatController] Live data error:', e.message); return null; }),
+                new Promise(resolve => setTimeout(() => resolve(null), LIVE_TIMEOUT_MS)),
+            ]),
+        ]);
+
         if (relevantDocs && relevantDocs.length > 0) {
             const addedContext = relevantDocs.map(doc =>
                 `📌 Título: ${doc.title}\n🔗 Fuente: ${doc.url}\n📄 Información: ${doc.content}`
@@ -65,17 +73,11 @@ export const chatController = async (req, res) => {
             context = (context ? context + '\n\n' : '') + addedContext;
         }
 
-        // Live data from oran.gob.ar API (cached 1h, keyword-triggered)
-        try {
-            const liveDocs = await getLiveContext(message);
-            if (liveDocs && liveDocs.length > 0) {
-                const liveContext = liveDocs.map(doc =>
-                    `📡 Dato en tiempo real — ${doc.title}\n🔗 Fuente: ${doc.url}\n📄 Contenido:\n${doc.content}`
-                ).join('\n\n');
-                context = (context ? context + '\n\n' : '') + liveContext;
-            }
-        } catch (e) {
-            console.error('[chatController] Live data error:', e.message);
+        if (liveDocs && liveDocs.length > 0) {
+            const liveContext = liveDocs.map(doc =>
+                `📡 Dato en tiempo real — ${doc.title}\n🔗 Fuente: ${doc.url}\n📄 Contenido:\n${doc.content}`
+            ).join('\n\n');
+            context = (context ? context + '\n\n' : '') + liveContext;
         }
 
         // Build system prompt (inject optional context if provided by n8n/RAG)

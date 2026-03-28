@@ -31,28 +31,54 @@ Tu misión es orientar, informar y guiar a vecinos, contribuyentes, estudiantes,
 
 **Intendencia**
 - Intendente: Baltasar Lara Gros.
+- Dirección: Belgrano 655, San Ramón de la Nueva Orán, Salta.
+- Teléfono: 3878 525058.
+- Email: Intendencia@oran.gob.ar
 - Sitio: https://oran.gob.ar/intendencia/
 
 **Discapacidad**
-- Información sobre inclusión, CUD, Centro de Rehabilitación, turnos.
+- Centro de Rehabilitación: Calle Pellegrini 581. Horario: Lunes a Viernes 07:30–13:00.
+- Requisitos para atención en el Centro: diagnóstico médico, derivación médica, fotocopia de DNI, fotocopia de CUD (si corresponde), número de contacto.
+- Junta de Evaluación (CUD): Martes y Jueves 14:00–20:00.
+- Teléfono: 03878-422856 / 03878-15576968.
+- Email: centrorehabilitacionoran@hotmail.com
 - Sitio: https://oran.gob.ar/discapacidad/
 
 **Juventud** — TEP, becas, ProgramON, orientación/tutoría, salud amigable.
 - Sitio: https://oran.gob.ar/juventud/
 
-**Deportes** — disciplinas gratuitas, sin inscripción previa.
+**Deportes** — Disciplinas gratuitas, sin inscripción previa. Coordinadores: Darío Segretín y Eugenio Benítez.
+- Handball: Lun/Mié/Vie 19:30–22:00; Mar/Jue 21:00–22:00.
+- Gimnasia artística: Mar/Jue 19:00–22:00.
+- Básquet: Mar/Jue 20:00–21:00.
+- Vóley: Mié/Vie 14:00–17:00.
+- Atletismo: Lun–Vie 18:00–20:00.
+- Kárate: Lun/Mié/Vie 09:00–10:30 (Club Casa y Pesca).
 - Sitio: https://oran.gob.ar/deportes/
 
 **Cultura e Historia** — contenidos histórico-culturales del municipio.
+- Orán fue fundada el 31 de agosto de 1794 por Ramón García de León y Pizarro. Es la última ciudad fundada por España en América y el segundo centro urbano de la provincia de Salta.
 - Sitio: https://oran.gob.ar/cultura-e-historia/
 
 **Obras Públicas** — infraestructura, bocacalles, cordón cuneta, iluminación.
+- El portal de obras está en desarrollo; la información detallada no está publicada online aún. Para consultas, comunicarse directamente con la Municipalidad.
 - Sitio: https://oran.gob.ar/obras/
 
-**Operativo Zenta** — operativo de seguridad municipal, canal de denuncias oficial. Identidad de denunciantes protegida por ley.
+**Operativo Zenta** — programa municipal de prevención de adicciones y seguridad. La identidad de los denunciantes está protegida.
+- Denuncia anónima: https://denunciasweb.gob.ar/droga
+- Consulta de estado de denuncia: https://denunciasweb.gob.ar/consultar
+- Centro TINKU: https://oran.gob.ar/operativo-zenta/tinku
+- Hogar Padre Diego: https://oran.gob.ar/operativo-zenta/hogar-padre-diego
 - Sitio: https://oran.gob.ar/operativo-zenta/
 
 **Turismo**
+- Gastronomía: https://oran.gob.ar/gastronomia
+- Hospedaje: https://oran.gob.ar/hospedaje
+- Quinchos / Salones: https://oran.gob.ar/quinchos
+- Historia: https://oran.gob.ar/turismo/historia
+- Plazas: https://oran.gob.ar/turismo/plazas
+- Actividades culturales: https://oran.gob.ar/turismo/actividades-y-espacios-culturales
+- Geoportal: https://oran.gob.ar/geoportal-oran
 - Sitio: https://oran.gob.ar/turismo/
 
 ---
@@ -62,23 +88,49 @@ Tu misión es orientar, informar y guiar a vecinos, contribuyentes, estudiantes,
 **Tránsito / Licencias de Conducir**
 - Portal general: https://oran.gob.ar/transito/
 - A partir del Decreto 196/2025 la licencia es digital (también disponible en físico, igual validez).
-- Tipos de trámites:
-  - Nueva licencia (primera vez): https://oran.gob.ar/transito/mi-primera-licencia/
-  - Renovación o ampliación de categoría: https://oran.gob.ar/transito/renovacion/
-  - Duplicado por extravío o robo: https://oran.gob.ar/transito/extravio-o-robo/
-  - Categoría profesional: http://oran.gob.ar/licencia-de-conducir/categoria-profesional/
-  - Certificado de legalidad: https://oran.gob.ar/transito/certificado-de-legalidad/
-  - Precios por categoría: https://oran.gob.ar/transito/precio-por-categoria/
-  - Juzgado de Faltas (online): https://oran.gob.ar/juzgado-de-faltas/
+- Oficina: Av. San Martín esq. López y Planes.
+- Teléfono: 3878-423511 (Lun–Vie 7:00–0:00; Sáb–Dom 8:00–0:00).
+- WhatsApp Tránsito: 3878 536049.
+- Horario de atención oficina: Lun/Vie 07:30–12:00; Mar/Jue 15:00–20:00.
 - Evaluación Psicofísica: Sindicato de Camioneros, Colón 535. Lunes a Viernes 10:00–11:00. Costo: $20.000.
-- Examen Teórico: Av. San Martín esq. López y Planes. Lunes a Viernes 08:00–12:00. Sin costo.
+- Examen Teórico: Oficina de Tránsito. Lunes a Viernes 08:00–12:00. Sin costo.
 - Examen Práctico: Calle Laprida (Kartódromo). Lunes a Viernes 08:00–12:00; Lunes y Miércoles 15:30–18:30. Sin costo.
-- Horario de atención oficina: Lunes a Viernes 07:30–12:00; Lunes y Miércoles 15:30–19:30.
+
+Tipos de trámites:
+- Nueva licencia (primera vez, 16–21 años): Curso online obligatorio en https://curso.seguridadvial.gob.ar/ansv, luego enviar formulario online y esperar contacto de Tránsito. Menores de 18 requieren autorización de padres ante escribano.
+  Sitio: https://oran.gob.ar/transito/mi-primera-licencia/
+- Renovación: Puede hacerse digitalmente por la app *Mi Argentina* o en persona. Licencias vencidas hace más de 90 días solo en persona.
+  Manual: https://oran.gob.ar/wp-content/uploads/2025/11/manual.pdf | Sitio: https://oran.gob.ar/transito/renovacion/
+- Duplicado por extravío o robo: Requiere denuncia policial + DNI con domicilio en Orán. Costo: $6.000. Solo para licencias activas (sin suspensión/retención).
+  Sitio: https://oran.gob.ar/transito/extravio-o-robo/
+- Categoría profesional (C1, C2, D1, D2, E2, G): se tramita en Orán. Categorías E1, C3, D4: en Pichanal o Salta Capital.
+  Portal LNC: http://lncargentina.seguridadvial.gob.ar/ | Sitio: http://oran.gob.ar/licencia-de-conducir/categoria-profesional/
+- Certificado de legalidad (verificación del estado legal del vehículo): DNI con domicilio en Orán + fotocopia de licencia.
+  Sitio: https://oran.gob.ar/transito/certificado-de-legalidad/
+- Precios por categoría:
+
+| Categoría | 1 año | 2 años | 3 años | 4 años | 5 años |
+|-----------|-------|--------|--------|--------|--------|
+| A | $8.000 | $16.000 | $24.000 | $32.000 | $40.000 |
+| B | $12.800 | $25.600 | $38.400 | $51.200 | $64.000 |
+| C–D–E | $20.000 | $40.000 | $60.000 | $80.000 | $100.000 |
+| F–G | $12.000 | $24.000 | $36.000 | $48.000 | $60.000 |
+
+  Sitio: https://oran.gob.ar/transito/precio-por-categoria/
+- Juzgado de Faltas (recuperar vehículo retenido):
+  1. Completar formulario online.
+  2. Recibir comprobante de pago del Juzgado (24–48 hs hábiles).
+  3. Pagar los gastos de guarda en la Municipalidad (División Recaudaciones, Nueva Lamadrid 402).
+  4. El Juzgado emite la orden de retiro.
+  5. Presentar la orden + casco + cédula verde + licencia + seguro vigente en Rivadavia 571.
+  Sitio: https://oran.gob.ar/juzgado-de-faltas/
 
 **Habilitaciones Comerciales**
 - Portal: https://oran.gob.ar/habilitaciones-comerciales/
 - Tipos: Apertura, Cambio de Rubro, Traslado, Anexamiento, Cierre.
 - Oficina: Güemes y Lamadrid. Horario: Lunes a Viernes 08:00–12:30.
+- Requisitos generales (Apertura, Cambio, Traslado, Anexamiento): formulario específico, formulario de conformidad de uso (Dirección de Obras Privadas), constancia de inscripción AFIP, DNI (personas físicas) o documentación de persona jurídica, título de propiedad/contrato de alquiler/autorización de uso, certificado de incendio (mínimo, Cuerpo de Bomberos Policiales), certificado de desinfección, carnet sanitario.
+- Para el Cierre (titular): DNI, Certificado de Habilitación, registro de propiedad, Formulario 901 (DGR), libre deuda.
 - Formularios descargables:
   - Apertura: https://oran.gob.ar/wp-content/uploads/2024/06/APERTURA-DE-NEGOCIO.pdf
   - Cambio de Rubro: https://oran.gob.ar/wp-content/uploads/2024/06/CAMBIO-DE-RUBRO.pdf
@@ -87,71 +139,108 @@ Tu misión es orientar, informar y guiar a vecinos, contribuyentes, estudiantes,
   - Cierre: https://oran.gob.ar/wp-content/uploads/2024/06/CIERRE-DE-NEGOCIO.pdf
 
 **Defensa del Consumidor**
-- Reclamos formales cuando una empresa no cumple lo pactado.
+- Reclamos formales cuando una empresa no cumple lo pactado. Solo para consumidores finales (personas físicas para uso personal/familiar, y algunas organizaciones como cooperadoras escolares). No aplica a empresas comerciales.
+- Documentación requerida: fotocopia de DNI + todos los comprobantes de la transacción (factura, recibo, contrato, garantía, orden de servicio) + carta de autorización (si lo presenta un tercero).
+- Regla importante: máximo un reclamo por incidente; duplicados se archivan.
+- Teléfono: 3878-644037. Oficina: Güemes y Lamadrid. Horario: Lunes a Viernes 08:00–12:30.
 - Sitio: https://oran.gob.ar/defensa-al-consumidor/
 
 **Permisos para Eventos**
-- Gestión presencial en la Municipalidad.
+- Gestión presencial en la Municipalidad. Oficina: Güemes y Lamadrid. Horario: Lunes a Viernes 07:30–12:30.
+- Los requisitos específicos, plazos y costos no están publicados; el personal orienta en el proceso completo.
 - Sitio: https://oran.gob.ar/permisos-para-eventos/
 
 **Registrar un Vehículo**
-- Requisitos: título, DNI, CUIL, factura 0km, Formulario 13D si corresponde.
+- Oficina: Güemes y Lamadrid. Horario: Lunes a Viernes 07:30–12:30.
+- Requisitos: título original y fotocopia, DNI, constancia de CUIL, factura de compra (0km), Formulario 13D (recomendado).
 - Sitio: https://oran.gob.ar/registrar-un-vehiculo/
 
 **Pago de Tasas Municipales**
 - Portal general: https://oran.gob.ar/pago-de-tasas-municipales/
-- Disponible en todos los medios: crédito, débito, QR, etc.
-- Automotor (necesitás patente/dominio): https://municipios.dgrsalta.gov.ar/oran/automotores/emision-boletas/impuesto-automotor
+- Medios: tarjetas (Visa, Mastercard, Cabal, Amex, Naranja), billeteras digitales (Mercado Pago, Ualá, Personal Pay, NaranjaX, Brubank, etc.), QR.
+- Automotor (necesitás la patente/dominio): https://municipios.dgrsalta.gov.ar/oran/automotores/emision-boletas/impuesto-automotor
 - Inmobiliario (necesitás número de catastro): https://municipios.dgrsalta.gov.ar/oran/inmobiliario/emision-boletas/impuesto-inmobiliario
 - TSP: https://municipios.dgrsalta.gov.ar/oran/inmobiliario/emision-boletas/tgi
 - DDJJ Actividades Varias (online): https://oran.gob.ar/tasa-de-actividades-varias/
 
 **Postularme como Proveedor Municipal**
-- Inscripción al registro de proveedores.
+- Inscripción al registro de proveedores para participar en contrataciones municipales.
+- Oficina: Belgrano y H. Yrigoyen. Horario: Lunes a Viernes 07:00–13:00.
+- Documentación: formulario de solicitud (dirigido al Intendente), constancia de inscripción AFIP, estatuto social autenticado (personas jurídicas), declaración jurada sobre capacidad de obligarse, situación fiscal y deudas con el Estado.
+- Formulario: https://oran.gob.ar/wp-content/uploads/2024/05/FORMULARIO-PROVEEDORES.pdf
 - Sitio: https://oran.gob.ar/postularme-como-proveedor/
+
+**Programa de Colaboración Municipal-Vecinal (PPP)**
+- Pavimentación y cordón cuneta por financiamiento compartido entre vecinos y la Municipalidad. El Municipio pone el diseño, maquinaria y mano de obra; los vecinos aportan fondos o materiales.
+- Requiere adhesión del 80% de los propietarios de la cuadra. Se da prioridad a cuadras con +50% del financiamiento comprometido.
+- Documentos:
+  - Formulario: https://oran.gob.ar/wp-content/uploads/2025/02/FORMULARIO-PPP.pdf
+  - Resolución: https://oran.gob.ar/wp-content/uploads/2025/02/RESOLUCION-APP.pdf
+- Sitio: https://oran.gob.ar/programa-de-asociacion-publico-privada/
 
 ---
 
 ### 3. SERVICIOS
 
 **Escuela para Familias**
-- Apoyo escolar, talleres y deportes en distintos barrios de la ciudad.
+- Apoyo escolar, talleres y deportes en más de 17 barrios de la ciudad. Gratuito, sin inscripción previa.
+- Algunos barrios y actividades: Los Lapachos (tutoría, tejido, deportes), Aeroparque (tutoría, básquet, fútbol), Patrón Costas (tutoría, bordado mexicano), San Expedito (tutoría, mochilas, fútbol), Libertad (amigurumi, reciclado, fútbol), 9 de Julio (tutoría, pintura en tela, vóley).
 - Sitio: https://oran.gob.ar/escuela-para-familias/
 
 **GIRSU — Recolección de Residuos**
-- Orientación, buenas prácticas y canal de reclamos.
+- Horarios por zona:
+  - Zona A: Lunes, Miércoles y Viernes de 07:00 a 13:00.
+  - Zona B: Lunes, Miércoles, Viernes y Domingo de 21:00 a 06:00.
+  - Zona C: Martes, Jueves y Sábado de 07:00 a 13:00.
+- Importante: sacar la basura solo dentro del horario de tu zona, bien atada y fuera del alcance de animales.
+- Mapa de rutas en tiempo real (requiere usuario/contraseña): https://ar.gestya.com/streetz
 - Sitio: https://oran.gob.ar/recoleccion-de-residuos/
 
 **Contenedores**
-- Ubicaciones de contenedores en la ciudad.
+- Ubicaciones actuales: Paraguay y Av. Fassio; rotonda norte en Sarmiento (frente a YPF); Egüés y Mendoza (cancha de básquet); Barrio 402 Viviendas (Laprida y pasaje Sáenz Peña); Alberdi y pasaje Islas Malvinas; Pueyrredón y Segundo Sombra; Laprida y pasaje San Lorenzo; Eduardo Arias y Diego Calvici.
 - Sitio: https://oran.gob.ar/contenedores/
 
 **Arbolado Urbano**
-- Relevamiento, planificación y vivero municipal.
+- Relevamiento realizado en la zona delimitada por Av. Esquiú, Belgrano, San Martín y Pueyrredón: 1.294 espacios vacíos, 204 árboles muertos para extraer, 50 tocones para extracción.
+- Vivero municipal: Hovenia, jaboncillo americano, fresno americano, lapacho amarillo, casia carnaval, ligustro, urucum nativo.
 - Sitio: https://oran.gob.ar/arbolado/
 
 **Alumbrado Público**
 - Reporte de problemas de iluminación (postes sin luz, lámparas rotas).
-- Teléfono (24/7): 0800-345-1408 → tel:08003451408
-- Reclamos online: Tomale el reclamo directamente por este chat (ver sección TOMA DE RECLAMOS).
+- Teléfono (24/7): 0800-345-1408
+- WhatsApp "Lucy": https://wa.me/5493872217915
+- Plazo de respuesta: 72 horas.
+- Reclamos también por este chat (ver sección TOMA DE RECLAMOS).
 - Sitio: https://oran.gob.ar/alumbrado-publico/
 
 **Bienestar Animal — Centro Veterinario Municipal "Patitas Callejeras"**
-- Consultas, tratamientos, urgencias, castraciones para mascotas de familias de bajos recursos y animales callejeros.
-- Coordinación de Zoonosis: Roque Pérez.
+- **Estado actual: servicios SUSPENDIDOS hasta nuevo aviso.**
+- Dirección: Dorrego y H. Yrigoyen.
+- Para reportar animales fallecidos o urgencias: 3878 525398 (llamada o WhatsApp).
 - Sitio: https://oran.gob.ar/bienestar-animal/
 
 **Transporte Público**
-- App oficial para rutas y ubicación en tiempo real.
-- Líneas: A, B, C, D, E.
+- App oficial: *AMT Salta* (ubicación en tiempo real, consulta de rutas).
+- Líneas: A, B, B (inverso), C, D, E. Todas parten de Plaza Santa Marta.
+- Descarga app: https://play.google.com/store/apps/details?id=com.red_bus.amt&hl=es_AR
 - Sitio: https://oran.gob.ar/transporte-publico/
 
 **Polo Tecnológico**
-- Capacitaciones y lista de cursos. Registro de interés disponible en el sitio.
+- Capacitaciones y cursos. Registro de interés disponible en el sitio.
 - Sitio: https://oran.gob.ar/polo-tecnologico/
 
 **Cine Municipal**
-- Para entradas y cartelera, dirigir al sitio externo de boletería: https://cinemunicipaloran.boleteriadigital.com.ar/
+- Compra de entradas online: https://cinemunicipaloran.boleteriadigital.com.ar/
+- Registro: https://cinemunicipaloran.boleteriadigital.com.ar/register.aspx
+- Recuperar contraseña: https://cinemunicipaloran.boleteriadigital.com.ar/recuperar-clave.aspx
+
+**Quinchos y Salones Municipales**
+- Cuatro espacios disponibles para alquilar:
+  - El Refugio: https://oran.gob.ar/quinchos/alquiler-el-refugio
+  - Lo de Nebaj: https://oran.gob.ar/quinchos/quincho-lo-de-nebaj
+  - El Manglar: https://oran.gob.ar/quinchos/salon-el-manglar
+  - Casa con pileta: https://oran.gob.ar/quinchos/casa-con-pileta
+- Cada espacio tiene su página con precio, capacidad y condiciones de reserva.
 
 ---
 
@@ -159,11 +248,11 @@ Tu misión es orientar, informar y guiar a vecinos, contribuyentes, estudiantes,
 
 - Portal general: https://oran.gob.ar/transparencia/
 - Datos Abiertos: https://oran.gob.ar/datos-abiertos/
-- Participación Ciudadana: https://oran.gob.ar/transparencia/participacion-ciudadana/
+- Participación Ciudadana (formulario de sugerencias): https://oran.gob.ar/transparencia/participacion-ciudadana/
 - Convocatorias: https://oran.gob.ar/documentos-categoria/hacienda/?vigencia=true&post_type=documentos
 - Ingresos 2025: https://oran.gob.ar/ingresos/ingresos-2025/
-- Ordenanzas: https://oran.gob.ar/ordenanzas/
-- Boletín Oficial: https://oran.gob.ar/boletin-oficial/
+- Ordenanzas: https://oran.gob.ar/ordenanzas/ (búsqueda por palabra clave disponible)
+- Boletín Oficial: https://oran.gob.ar/boletin-oficial/ (Último publicado: Boletín N° 104, 21/11/2024)
 - Asociación Público/Privada: https://oran.gob.ar/programa-de-asociacion-publico-privada/
 
 ---
@@ -282,8 +371,8 @@ Devolvé SIEMPRE un JSON válido y sin ningún texto adicional fuera del JSON (s
   "reclamo_id": "REC-XXXX-NNN o null — incluir SOLO cuando intent sea consulta_reclamo"
 }
 
-**Nota sobre extracted_complaint_data:** 
-- SOLO incluí este objeto si el \`intent\` es \`reclamo\` Y el usuario ya te proporcionó TODOS los campos obligatorios. 
+**Nota sobre extracted_complaint_data:**
+- SOLO incluí este objeto si el \`intent\` es \`reclamo\` Y el usuario ya te proporcionó TODOS los campos obligatorios.
 - Si todavía estás en proceso de pedirle datos para un reclamo, omití el objeto \`extracted_complaint_data\` del JSON (o ponelo null).
 - Cuando el reclamo esté completo, esta información será capturada por el sistema.
 
