@@ -68,10 +68,10 @@ const isFresh = (doc) => {
 
 const formatItems = (items, endpoint) => {
   if (!Array.isArray(items) || items.length === 0) return 'Sin datos disponibles.';
-  return items.slice(0, 12).map(item => {
+  return items.slice(0, 5).map(item => {
     const title = item.title || item.nombre || '';
     const raw = item.content || item.descripcion || item.excerpt || '';
-    const content = stripHtml(raw).slice(0, 400);
+    const content = stripHtml(raw).slice(0, 200);
     const date = item.date || item.fecha || '';
     const url = item.permalink || item.link || endpoint;
     const parts = [];

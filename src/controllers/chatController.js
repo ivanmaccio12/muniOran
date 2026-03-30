@@ -57,8 +57,9 @@ export const chatController = async (req, res) => {
         }
 
         // RAG + live data en paralelo, con timeout máximo de 6s para live data
+        // max 2 docs RAG (300 chars c/u), max 2 endpoints live data
         const LIVE_TIMEOUT_MS = 6000;
-        const [relevantDocs, liveDocs] = await Promise.all([
+        const [relevantDocsRaw, liveDocsRaw] = await Promise.all([
             searchKnowledge(message).catch(e => { console.error('[chatController] RAG error:', e.message); return []; }),
             Promise.race([
                 getLiveContext(message).catch(e => { console.error('[chatController] Live data error:', e.message); return null; }),
@@ -66,9 +67,12 @@ export const chatController = async (req, res) => {
             ]),
         ]);
 
+        const relevantDocs = relevantDocsRaw?.slice(0, 2);
+        const liveDocs = liveDocsRaw?.slice(0, 2);
+
         if (relevantDocs && relevantDocs.length > 0) {
             const addedContext = relevantDocs.map(doc =>
-                `📌 Título: ${doc.title}\n🔗 Fuente: ${doc.url}\n📄 Información: ${doc.content}`
+                `📌 Título: ${doc.title}\n🔗 Fuente: ${doc.url}\n📄 Información: ${String(doc.content).slice(0, 300)}`
             ).join('\n\n');
             context = (context ? context + '\n\n' : '') + addedContext;
         }
@@ -86,7 +90,7 @@ export const chatController = async (req, res) => {
             ? `\n\nCONTEXTO adicional proporcionado por el sistema:\n"""\n${context}\n"""`
             : '';
 
-        // Load conversation history from PostgreSQL (expires after 24h automatically)
+        // Load conversation history (expires after 24h automatically)
         const history = await getHistory(session_id);
 
         // Si viene media_url, incluirla en el mensaje para que Claude lo considere
@@ -94,11 +98,22 @@ export const chatController = async (req, res) => {
             ? `${message}\n[Adjunto de imagen recibido: ${media_url}]`
             : message;
 
-        // Build messages array: existing history + new user message
-        const messages = [...history, { role: 'user', content: effectiveMessage }];
+        // Historial diferenciado: completo si hay un reclamo en curso, mínimo para el resto
+        const MAX_GENERAL_HISTORY = 4;
+        const isInReclamoFlow = history.some(msg => {
+            if (msg.role !== 'assistant') return false;
+            try {
+                const parsed = JSON.parse(msg.content);
+                return parsed.intent === 'reclamo';
+            } catch { return false; }
+        });
+        const trimmedHistory = isInReclamoFlow ? history : history.slice(-MAX_GENERAL_HISTORY);
+
+        // Build messages array: trimmed history + new user message
+        const messages = [...trimmedHistory, { role: 'user', content: effectiveMessage }];
 
         const response = await anthropic.messages.create({
-            model: 'claude-sonnet-4-5-20250929',
+            model: 'claude-haiku-4-5-20251001',
             max_tokens: 1024,
             system: systemPrompt + contextBlock,
             messages: messages,
