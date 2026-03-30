@@ -114,7 +114,7 @@ export const chatController = async (req, res) => {
 
         const response = await anthropic.messages.create({
             model: 'claude-haiku-4-5-20251001',
-            max_tokens: 1024,
+            max_tokens: 2048,
             system: systemPrompt + contextBlock,
             messages: messages,
         });
@@ -133,9 +133,9 @@ export const chatController = async (req, res) => {
             }
         } catch (parseError) {
             console.error('Claude did not return valid JSON. Error:', parseError.message);
-            // Graceful fallback
+            // Graceful fallback: strip ```json...``` blocks even si el cierre está truncado
             parsedReply = {
-                answer: replyText.replace(/```json[\s\S]*```/g, ''), // Strip code blocks just in case
+                answer: replyText.replace(/```json[\s\S]*/g, '').trim(), // Strip desde ```json hasta el final (maneja truncados)
                 intent: 'otro',
                 topic: 'desconocido',
                 suggested_next_questions: [],
